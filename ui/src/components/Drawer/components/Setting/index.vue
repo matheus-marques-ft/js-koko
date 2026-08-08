@@ -30,7 +30,7 @@ const { t } = useI18n();
 const { theme } = storeToRefs(terminalSettingsStore);
 
 const currentTerminalConn = computed(() => {
-  // TODO 默认取 map 中第 0 项
+  // TODO Default to the 0th item in the map
   const conn = connectionStore;
 
   return {
@@ -78,7 +78,7 @@ watch(
 );
 
 /**
- * @description 更新主题
+ * @description Update the theme
  * @param value
  */
 function handleUpdateTheme(value: string) {
@@ -100,7 +100,7 @@ function handleUpdateTheme(value: string) {
 }
 
 /**
- * @description 预览主题
+ * @description Preview the theme
  * @param event
  */
 function previewTheme(event: KeyboardEvent) {
@@ -109,10 +109,10 @@ function previewTheme(event: KeyboardEvent) {
     let nextIndex = currentIndex;
 
     if (event.key === 'ArrowUp') {
-      // 如果当前索引为 0，则跳转到最后一个选项，否则向上移动
+      // If the current index is 0, jump to the last option; otherwise move up
       nextIndex = currentIndex === 0 ? themeOptions.value.length - 1 : currentIndex - 1;
     } else if (event.key === 'ArrowDown') {
-      // 如果当前索引为最后一个，则跳转到第一个选项，否则向下移动
+      // If the current index is the last one, jump to the first option; otherwise move down
       nextIndex = currentIndex === themeOptions.value.length - 1 ? 0 : currentIndex + 1;
     }
 
@@ -126,14 +126,14 @@ function previewTheme(event: KeyboardEvent) {
 }
 
 /**
- * @description 点击折叠按钮
+ * @description Click the collapse button
  */
 function handleItemHeaderClick(data: { name: string | number; expanded: boolean; event: MouseEvent }) {
   showLeftArrow.value = !data.expanded;
 }
 
 /**
- * @description 移除在线用户
+ * @description Remove an online user
  */
 function handlePositiveClick(userMeta: OnlineUser) {
   const { socket, terminalId, sessionId } = currentTerminalConn.value;
@@ -150,7 +150,7 @@ function handlePositiveClick(userMeta: OnlineUser) {
 }
 
 /**
- * @description 创建分享链接
+ * @description Create a share link
  * @param shareLinkRequest
  */
 function handleCreateShareUrl(shareLinkRequest: any) {
@@ -171,7 +171,7 @@ function handleCreateShareUrl(shareLinkRequest: any) {
 }
 
 /**
- * @description 搜索分享用户
+ * @description Search for share users
  * @param query
  */
 function handleSearchShareUser(query: string) {
@@ -180,7 +180,7 @@ function handleSearchShareUser(query: string) {
 }
 
 /**
- * @description 写入命令
+ * @description Write a command
  * @param command
  */
 async function handleWriteCommand(command: string) {

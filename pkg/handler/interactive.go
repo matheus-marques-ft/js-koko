@@ -135,7 +135,7 @@ func (h *InteractiveHandler) Initial() {
 }
 
 func (h *InteractiveHandler) GetPtySize() (int, int) {
-	// todo: 优化直接存储
+	// todo: optimize direct storage
 	pty := h.sess.Pty()
 	return pty.Window.Width, pty.Window.Height
 }
@@ -394,7 +394,7 @@ func (h *InteractiveHandler) loadUserNodes() {
 func getPageSize(h *InteractiveHandler, termConf *model.TerminalConfig) int {
 	var (
 		pageSize  int
-		minHeight = 8 // 分页显示的最小高度
+		minHeight = 8 // minimum height for paginated display
 
 	)
 	_, height := h.GetPtySize()

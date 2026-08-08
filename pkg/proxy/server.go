@@ -236,7 +236,7 @@ func (s *Server) GetFilterParser() *Parser {
 	protocol := s.connOpts.authInfo.Protocol
 	filterRules := s.connOpts.authInfo.CommandFilterACLs
 	platform := s.connOpts.authInfo.Platform
-	// 过滤规则排序
+	// Sort the filter rules
 	sort.Sort(model.CommandACLs(filterRules))
 	pty := s.UserConn.Pty()
 	parser := Parser{
@@ -458,7 +458,7 @@ func (s *Server) createAvailableHTTPGateWay() *domainHTTP {
 	}
 }
 
-// getSSHConn 获取ssh连接
+// getSSHConn gets the ssh connection
 func (s *Server) getK8sConConn(localTunnelAddr *net.TCPAddr) (srvConn srvconn.ServerConnection, err error) {
 	namespaceValue := ""
 	if k8sSettings, ok := s.connOpts.authInfo.Platform.GetProtocolSetting(srvconn.ProtocolK8s); ok {
@@ -535,7 +535,7 @@ func (s *Server) getRedisConn(localTunnelAddr *net.TCPAddr) (srvConn *srvconn.Re
 		protocolSetting := platformProtocol.GetSetting()
 		isAuthUsername = protocolSetting.AuthUsername
 
-		// 解析集群模式配置 TODO: 将优化 sdk-go 的 ProtocolSetting 加上 enable_cluster_mode
+		// Parse the cluster mode configuration. TODO: improve sdk-go's ProtocolSetting to add enable_cluster_mode
 		if useCluster, exists := platformProtocol.Setting["enable_cluster_mode"]; exists {
 			isClusterMode = parseBoolValue(useCluster)
 		}
@@ -656,7 +656,7 @@ func (s *Server) getSSHConn() (srvConn *srvconn.SSHConnection, err error) {
 		return ans, nil
 	})
 	sshAuthOpts = append(sshAuthOpts, kb)
-	// 获取网关配置
+	// Get the gateway configuration
 	proxyArgs := s.getGatewayProxyOptions()
 	if proxyArgs != nil {
 		sshAuthOpts = append(sshAuthOpts, srvconn.SSHClientProxyClient(proxyArgs...))
@@ -685,8 +685,8 @@ func (s *Server) getSSHConn() (srvConn *srvconn.SSHConnection, err error) {
 
 	if s.suFromAccount != nil {
 		/*
-			suFromAccount 是 switch user
-			account 是最终 su 的登录用户
+			suFromAccount is the switch user
+			account is the final login user after su
 		*/
 		suUsername := s.account.Username
 		sudoType := srvconn.SuMethodSu
@@ -791,7 +791,7 @@ func (s *Server) getTelnetConn() (srvConn *srvconn.TelnetConnection, err error) 
 	}))
 	charset := s.getCharset()
 	telnetOpts = append(telnetOpts, srvconn.TelnetCharset(charset))
-	// 获取网关配置
+	// Get the gateway configuration
 	proxyArgs := s.getGatewayProxyOptions()
 	if proxyArgs != nil {
 		telnetOpts = append(telnetOpts, srvconn.TelnetProxyOptions(proxyArgs))
@@ -831,7 +831,7 @@ func (s *Server) getTelnetConn() (srvConn *srvconn.TelnetConnection, err error) 
 }
 
 func (s *Server) getGatewayProxyOptions() []srvconn.SSHClientOptions {
-	// 仅有一个网关的情况
+	// The case where there is only one gateway
 	if s.gateway != nil {
 		timeout := config.GlobalConfig.SSHTimeout
 		port := s.gateway.Protocols.GetProtocolPort(model.ProtocolSSH)
@@ -888,7 +888,7 @@ func (s *Server) getServerConn(proxyAddr *net.TCPAddr) (srvconn.ServerConnection
 
 func (s *Server) sendConnectingMsg(done chan struct{}) {
 	delay := 0.0
-	maxDelay := 5 * 60.0 // 最多执行五分钟
+	maxDelay := 5 * 60.0 // Run for at most five minutes
 	msg := fmt.Sprintf("%s  %.1f", s.connOpts.ConnectMsg(), delay)
 	utils.IgnoreErrWriteString(s.UserConn, msg)
 	var activeFlag bool
@@ -1022,7 +1022,7 @@ func (s *Server) Proxy() {
 		protocol := s.connOpts.authInfo.Protocol
 		switch protocol {
 		case srvconn.ProtocolSSH, srvconn.ProtocolTELNET:
-			// ssh 和 telnet 协议不需要本地启动代理
+			// The ssh and telnet protocols do not need to start a local proxy
 		case srvconn.ProtocolMongoDB:
 			dHTTP := s.createAvailableHTTPGateWay()
 			err := dHTTP.Start()
@@ -1132,7 +1132,7 @@ func ParseUrlHostAndPort(clusterAddr string) (host string, port int, err error) 
 	if err != nil {
 		return "", 0, err
 	}
-	// URL host 是包含port的结果
+	// The URL host is a result that includes the port
 	hostAndPort := strings.Split(clusterUrl.Host, ":")
 	var (
 		dstHost string

@@ -15,7 +15,7 @@ type OSSReplayStorage struct {
 }
 
 func (o OSSReplayStorage) Upload(gZipFilePath, target string) (err error) {
-	// 创建OSSClient实例。如果 endpoint 是空，会造成 panic，所以需要检查一下
+	// Create the OSSClient instance. If endpoint is empty it will cause a panic, so it needs to be checked
 	if o.Endpoint == "" {
 		logger.Error("OSS endpoint is empty")
 		return ErrEmptyEndpoint

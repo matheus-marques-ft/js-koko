@@ -29,9 +29,9 @@ type SwitchSession struct {
 
 	p *Server
 
-	currentOperator atomic.Value // 终断会话的管理员名称
+	currentOperator atomic.Value // Name of the admin who terminated the session
 
-	pausedStatus atomic.Bool // 暂停状态
+	pausedStatus atomic.Bool // Paused status
 
 	notifyMsgChan chan *exchange.RoomMessage
 
@@ -127,7 +127,7 @@ func (s *SwitchSession) filterUserInput(p []byte) []byte {
 }
 
 func (s *SwitchSession) recordCommand(cmdRecordChan chan *ExecutedCommand) {
-	// 命令记录
+	// Record commands
 	cmdRecorder := s.p.GetCommandRecorder()
 	for item := range cmdRecordChan {
 		if item.Command == "" {
@@ -136,11 +136,11 @@ func (s *SwitchSession) recordCommand(cmdRecordChan chan *ExecutedCommand) {
 		cmd := s.generateCommandResult(item)
 		cmdRecorder.Record(cmd)
 	}
-	// 关闭命令记录
+	// Close command recording
 	cmdRecorder.End()
 }
 
-// generateCommandResult 生成命令结果
+// generateCommandResult generates the command result
 func (s *SwitchSession) generateCommandResult(item *ExecutedCommand) *model.Command {
 	var (
 		input  string
@@ -161,7 +161,7 @@ func (s *SwitchSession) generateCommandResult(item *ExecutedCommand) *model.Comm
 	return s.p.GenerateCommandItem(user, input, output, item)
 }
 
-// Bridge 桥接两个链接
+// Bridge bridges two connections
 func (s *SwitchSession) Bridge(userConn UserConnection, srvConn srvconn.ServerConnection) (err error) {
 
 	parser := s.p.GetFilterParser()
@@ -171,7 +171,7 @@ func (s *SwitchSession) Bridge(userConn UserConnection, srvConn srvconn.ServerCo
 	srvInChan := make(chan []byte, 1)
 	done := make(chan struct{})
 	userInputMessageChan := make(chan *exchange.RoomMessage, 1)
-	// 处理数据流
+	// Process the data stream
 	userOutChan, srvOutChan := parser.ParseStream(userInputMessageChan, srvInChan)
 	parser.SetUserInputFilter(s.filterUserInput)
 
@@ -180,11 +180,11 @@ func (s *SwitchSession) Bridge(userConn UserConnection, srvConn srvconn.ServerCo
 		_ = userConn.Close()
 		_ = srvConn.Close()
 		parser.Close()
-		// 关闭录像
+		// Close the replay recording
 		replayRecorder.End()
 	}()
 
-	// 记录命令
+	// Record commands
 	cmdChan := parser.CommandRecordChan()
 	go s.recordCommand(cmdChan)
 
@@ -207,7 +207,8 @@ func (s *SwitchSession) Bridge(userConn UserConnection, srvConn srvconn.ServerCo
 		)
 		buffer := bytes.NewBuffer(make([]byte, 0, 1024*2))
 		/*
-		 这里使用了一个buffer，将用户输入的数据进行了分包，分包的依据是utf8编码的字符。
+		 A buffer is used here to split the user input data into packets;
+		 the split points are determined by utf8-encoded character boundaries.
 		*/
 		maxLen := 1024
 		for {
@@ -307,7 +308,7 @@ func (s *SwitchSession) Bridge(userConn UserConnection, srvConn srvconn.ServerCo
 	lang := s.p.connOpts.getLang()
 	for {
 		select {
-		// 检测是否超过最大空闲时间
+		// Check whether the maximum idle time has been exceeded
 		case now := <-tick.C:
 			if s.MaxSessionTime.Before(now) {
 				msg := lang.T("Session max time reached, disconnect")
@@ -333,7 +334,7 @@ func (s *SwitchSession) Bridge(userConn UserConnection, srvConn srvconn.ServerCo
 				return
 			}
 			continue
-			// 手动结束
+			// Manually terminated
 		case <-s.ctx.Done():
 			adminUser := s.loadOperator()
 			msg := fmt.Sprintf(lang.T("Terminated by admin %s"), adminUser)
@@ -341,7 +342,7 @@ func (s *SwitchSession) Bridge(userConn UserConnection, srvConn srvconn.ServerCo
 			s.disconnection(room, parser, replayRecorder, msg)
 			s.recordSessionFinished(model.ReasonErrAdminTerminate)
 			return
-			// 监控窗口大小变化
+			// Monitor window size changes
 		case win, ok := <-winCh:
 			if !ok {
 				return
@@ -355,7 +356,7 @@ func (s *SwitchSession) Bridge(userConn UserConnection, srvConn srvconn.ServerCo
 				Body:  p,
 			}
 			room.Broadcast(&msg)
-			// 经过parse处理的server数据，发给user
+			// Server data processed by the parser, sent to the user
 		case p, ok := <-srvOutChan:
 			if !ok {
 				s.recordSessionFinished(model.ReasonErrConnectDisconnect)
@@ -369,7 +370,7 @@ func (s *SwitchSession) Bridge(userConn UserConnection, srvConn srvconn.ServerCo
 				Body:  p,
 			}
 			room.Broadcast(&msg)
-			// 经过parse处理的user数据，发给server
+			// User data processed by the parser, sent to the server
 		case p, ok := <-userOutChan:
 			if !ok {
 				s.recordSessionFinished(model.ReasonErrUserClose)

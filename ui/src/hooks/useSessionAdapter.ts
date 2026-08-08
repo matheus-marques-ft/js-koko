@@ -16,7 +16,7 @@ import { useConnectionStore } from '@/store/modules/useConnection';
 import { FORMATTER_MESSAGE_TYPE } from '@/types/modules/message.type';
 
 /**
- * 会话数据适配器 - 统一普通连接和K8s连接的数据接口
+ * Session data adapter - unifies the data interface for regular connections and K8s connections
  */
 export function useSessionAdapter() {
   const { t } = useI18n();
@@ -31,18 +31,18 @@ export function useSessionAdapter() {
     return window.location.pathname.includes('/k8s');
   });
 
-  // 获取当前活跃的tab ID（K8s环境下使用）
+  // Get the current active tab ID (used in the K8s environment)
   const currentActiveTab = computed(() => {
     return terminalStore.currentTab;
   });
 
-  // 获取当前K8s节点信息
+  // Get the current K8s node information
   const getCurrentK8sNode = () => {
     if (!isK8sEnvironment.value || !currentActiveTab.value) return null;
     return treeStore.getTerminalByK8sId(currentActiveTab.value);
   };
 
-  // 统一的在线用户数据
+  // Unified online user data
   const onlineUsers = computed<OnlineUser[]>(() => {
     if (isK8sEnvironment.value) {
       const currentNode = getCurrentK8sNode();
@@ -59,7 +59,7 @@ export function useSessionAdapter() {
       const currentNode = getCurrentK8sNode();
       const currentTabId = currentActiveTab.value;
 
-      // 从节点的分享映射中获取当前 tab 的分享信息
+      // Get the share info for the current tab from the node's share maps
       const shareId = currentNode?.shareIdMap?.get(currentTabId) || '';
       const shareCode = currentNode?.shareCodeMap?.get(currentTabId) || '';
 
@@ -226,7 +226,7 @@ export function useSessionAdapter() {
           currentNode.shareCodeMap.delete(currentTabId);
         }
 
-        // 更新节点以触发响应式
+        // Update the node to trigger reactivity
         treeStore.setK8sIdMap(currentTabId, { ...currentNode });
       }
 

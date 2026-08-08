@@ -1,25 +1,25 @@
 export interface ITerminalSettings {
-  // 终端字体大小
+  // Terminal font size
   fontSize: number;
 
-  // 终端行高
+  // Terminal line height
   lineHeight: number;
 
-  // 终端字体
+  // Terminal font family
   fontFamily: string;
 
-  // 终端主题
+  // Terminal theme
   themeName: string;
 
-  // 是否启用 Ctrl+C 作为 Ctrl+Z
+  // Whether to enable Ctrl+C as Ctrl+Z
   ctrlCAsCtrlZ: string;
 
-  // 是否启用快速粘贴
+  // Whether to enable quick paste
   quickPaste: string;
 
-  // 是否启用退格键作为 Ctrl+H
+  // Whether to enable backspace key as Ctrl+H
   backspaceAsCtrlH: string;
 
-  // 主题
+  // Theme
   theme: string;
 }

@@ -344,11 +344,11 @@ func (u *UserSftpConn) generateSubFoldersFromNodeTree(nodeTrees model.NodeTreeLi
 	}
 	for _, item := range nodeTrees {
 		if isRoot && item.Pid != "" {
-			// 根路径下目录 pid 是空字符
+			// Under the root path, the directory's pid is an empty string
 			continue
 		}
 		if item.ChkDisabled {
-			// 资产被禁用，不显示
+			// The asset is disabled, do not display it
 			continue
 		}
 		switch item.Meta.Type {
@@ -413,7 +413,7 @@ func (u *UserSftpConn) generateSubFoldersFromAssets(assets []model.PermAsset) ma
 		return ok
 	}
 	for i := range assets {
-		// todo: 后期优化 API 循环查询的情况
+		// todo: optimize the API loop-query case later
 		permAssetDetail, err := u.jmsService.GetUserPermAssetDetailById(u.User.ID, assets[i].ID)
 		if err != nil {
 			logger.Errorf("Get perm detail asset %s err: %s", assets[i].Name, err)

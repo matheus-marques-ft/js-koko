@@ -90,7 +90,7 @@ const mappedUserOptions = computed(() => {
   }
 });
 
-// 装饰器模式：创建单选处理器
+// Decorator pattern: create a single-select handler
 const createSingleSelectHandler = <T, K extends keyof T>(
   options: T[],
   valueKey: K,
@@ -102,7 +102,7 @@ const createSingleSelectHandler = <T, K extends keyof T>(
       (item as any)[checkedKey] = item[valueKey] === selectedValue;
     });
 
-    // 执行回调函数，更新 shareLinkRequest
+    // Run the callback to update shareLinkRequest
     if (onSelect) {
       onSelect(selectedValue);
     }
@@ -158,7 +158,7 @@ const handleChangeActionPerm = createSingleSelectHandler(actionsPermOptions, 'va
 });
 
 /**
- * @description 创建会话分享链接
+ * @description Create a session share link
  */
 const handleCreateLink = () => {
   if (!shareInfo.value.sessionId) {
@@ -169,14 +169,14 @@ const handleCreateLink = () => {
 };
 
 /**
- * @description 复制会话分享链接
+ * @description Copy the session share link
  */
 const handleCopyShareURL = () => {
   _adapterCopyShareURL();
 };
 
 /**
- * @description 返回到上一层
+ * @description Go back to the previous level
  */
 const handleBack = () => {
   resetShareState();
@@ -303,7 +303,7 @@ const handleBack = () => {
 
   <n-descriptions v-else label-placement="top" :column="1">
     <n-descriptions-item>
-      <n-input placeholder="搜索" round size="small" readonly :value="shareInfo.shareURL">
+      <n-input placeholder="Search" round size="small" readonly :value="shareInfo.shareURL">
         <template #prefix>
           <Link :size="14" />
         </template>

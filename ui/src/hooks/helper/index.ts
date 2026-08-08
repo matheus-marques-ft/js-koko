@@ -1,6 +1,6 @@
 import type { Terminal } from '@xterm/xterm';
 
-// 引入 API
+// Import APIs
 import { useRoute } from 'vue-router';
 import { createDiscreteApi } from 'naive-ui';
 import { readText } from 'clipboard-polyfill';
@@ -13,7 +13,7 @@ import { BASE_WS_URL } from '@/utils/config';
 const { message } = createDiscreteApi(['message']);
 
 /**
- * 右键复制文本
+ * Right-click to copy text
  *
  * @param e
  * @param config
@@ -43,7 +43,7 @@ export async function handleContextMenu(
 }
 
 /**
- * 生成 Socket url
+ * Generate the socket URL
  */
 export function generateWsURL() {
   const route = useRoute();
@@ -105,10 +105,10 @@ export function generateWsURL() {
 }
 
 /**
- * @description 将 Base64 转化为字节数组
+ * @description Convert Base64 into a byte array
  */
 export function base64ToUint8Array(base64: string): Uint8Array {
-  // 转为原始的二进制字符串（binaryString）。
+  // Convert to the raw binary string (binaryString).
   const binaryString = atob(base64);
   const len = binaryString.length;
 
@@ -120,9 +120,9 @@ export function base64ToUint8Array(base64: string): Uint8Array {
 }
 
 /**
- * @description 更新网页图标。
+ * @description Update the web page favicon.
  *
- * @param {any} setting - 包含 LOGO_URLS 配置的设置对象。
+ * @param {any} setting - Settings object containing the LOGO_URLS config.
  */
 export function updateIcon(setting: any) {
   const faviconURL = setting.INTERFACE.favicon;

@@ -93,8 +93,8 @@ func NewTelnetConnection(opts ...TelnetOption) (*TelnetConnection, error) {
 }
 
 func newTelnetClient(conn net.Conn, cfg *TelnetConfig) (*tclientlib.Client, error) {
-	// 修复未登录成功，但是telnet连接不断的问题。
-	// todo：检测超时，直接断开连接，后续通过更新 telnet 包解决
+	// Fix the issue where login did not succeed, but the telnet connection kept retrying.
+	// todo: detect timeout and disconnect directly; resolve later by updating the telnet package
 	done := make(chan struct{})
 	go func() {
 		t := time.NewTicker(cfg.Timeout)

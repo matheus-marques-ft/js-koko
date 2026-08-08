@@ -1,7 +1,7 @@
 import { createApp } from 'vue';
 import VueCookies from 'vue3-cookies';
 
-// 引入指令
+// Import directives
 import { draggable } from '@/directive/sidebarDraggable.ts';
 
 import App from './App.vue';
@@ -10,7 +10,7 @@ import i18n from './locales';
 import router from './router';
 import './main.css';
 
-// 引入 xterm 样式
+// Import xterm styles
 import '@xterm/xterm/css/xterm.css';
 
 const app = createApp(App);

@@ -215,7 +215,7 @@ const (
 	SeparatorHashMark = "#"
 
 	/*
-		格式为: JMS-{token}
+		Format: JMS-{token}
 
 	*/
 	tokenPrefix = "JMS-"

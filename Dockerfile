@@ -1,4 +1,4 @@
-FROM jumpserver/koko-base:20260804_073307 AS stage-build
+FROM ghcr.io/matheus-marques-ft/koko-base:20260804_073307 AS stage-build
 WORKDIR /opt/koko
 ARG TARGETARCH
 COPY . .
@@ -25,7 +25,7 @@ FROM debian:trixie
 ARG TARGETARCH
 ENV LANG=en_US.UTF-8
 
-LABEL org.opencontainers.image.source=https://github.com/jumpserver/koko
+LABEL org.opencontainers.image.source=https://github.com/matheus-marques-ft/js-koko
 LABEL org.opencontainers.image.description="JumpServer Koko"
 
 

@@ -346,7 +346,7 @@ func (h *tty) syncUserPreference(preference *UserKoKoPreferenceParam) {
 }
 
 func (h *tty) createShareSession(shareData *ShareRequestParams) {
-	// 创建 共享连接
+	// create shared connection
 	res, err := h.handleShareRequest(shareData)
 	if err != nil {
 		logger.Errorf("Ws[%s] handle share request err: %s", h.ws.Uuid, err)

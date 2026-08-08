@@ -126,7 +126,7 @@ func (s *SftpHandler) Fileread(r *sftp.Request) (io.ReaderAt, error) {
 		logger.Infof("Sftp File read %s done", r.Filepath)
 		s.recorder.FinishFTPFile(f.FTPLog.ID)
 	}()
-	// 包裹一层，兼容 WinSCP 目录的批量下载
+	// wrap with an extra layer for compatibility with WinSCP's batch directory download
 	return NewReaderAt(f), err
 }
 

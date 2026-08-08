@@ -35,10 +35,10 @@ interface TerminalContext {
   sendLunaEvent: (event: string, data: any) => void;
 }
 
-// 创建注入键
+// Create the injection key
 export const terminalContextKey: InjectionKey<TerminalContext> = Symbol('terminal-context');
 
-// 创建 Context 实例
+// Create the Context instance
 export const createTerminalContext = (): TerminalContext => {
   const eventBus = mitt<TerminalEvents>();
   const connectionStore = useConnectionStore();
@@ -101,7 +101,7 @@ export const createTerminalContext = (): TerminalContext => {
         return;
       }
 
-      // 只有在 k8s 连接或切换的时候 currentTab 才会有值
+      // currentTab only has a value when connecting to or switching a k8s session
       if (currentTab) {
         const treeStore = useTreeStore();
         const currentNode = treeStore.getTerminalByK8sId(currentTab);
@@ -236,7 +236,7 @@ export const createTerminalContext = (): TerminalContext => {
   };
 };
 
-// 获取 Context
+// Get the Context
 export const useTerminalContext = () => {
   const context = inject(terminalContextKey);
 

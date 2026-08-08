@@ -40,15 +40,15 @@ func (cfg *SSHClientOptions) AuthMethods() []gossh.AuthMethod {
 			err    error
 		)
 		if cfg.Passphrase != "" {
-			// 先使用 passphrase 解析 PrivateKey
+			// First try parsing the PrivateKey using the passphrase
 			if signer, err = gossh.ParsePrivateKeyWithPassphrase([]byte(cfg.PrivateKey),
 				[]byte(cfg.Passphrase)); err == nil {
 				authMethods = append(authMethods, gossh.PublicKeys(signer))
 			}
 		}
 		if err != nil || cfg.Passphrase == "" {
-			// 1. 如果之前使用解析失败，则去掉 passphrase，则尝试直接解析 PrivateKey 防止错误的passphrase
-			// 2. 如果没有 Passphrase 则直接解析 PrivateKey
+			// 1. If parsing with the passphrase failed above, drop the passphrase and try parsing the PrivateKey directly, to guard against a wrong passphrase
+			// 2. If there is no Passphrase, parse the PrivateKey directly
 			if signer, err = gossh.ParsePrivateKey([]byte(cfg.PrivateKey)); err == nil {
 				authMethods = append(authMethods, gossh.PublicKeys(signer))
 			}

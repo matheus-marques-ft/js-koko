@@ -23,7 +23,7 @@ type Client struct {
 
 	sync.Mutex
 
-	// 用于防抖处理
+	// used for debounce handling
 	buffer      bytes.Buffer
 	bufferMutex sync.Mutex
 	timer       *time.Timer
@@ -52,7 +52,7 @@ func (c *Client) Read(p []byte) (n int, err error) {
 	return c.UserRead.Read(p)
 }
 
-// 向客户端发送数据进行1毫秒的防抖处理
+// debounce sending data to the client by 1 millisecond
 func (c *Client) Write(p []byte) (n int, err error) {
 	category := ""
 	connectToken := c.Conn.ConnectToken

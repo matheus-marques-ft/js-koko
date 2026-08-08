@@ -39,7 +39,7 @@ type LoginReviewService struct {
 	reviewers       []string
 	ticketDetailUrl string
 
-	processor string // 此审批的处理人
+	processor string // the processor handling this review
 }
 
 func (c *LoginReviewService) WaitLoginConfirm(ctx context.Context) Status {
@@ -61,7 +61,7 @@ func (c *LoginReviewService) GetProcessor() string {
 }
 
 func (c *LoginReviewService) waitConfirmFinish(ctx context.Context) Status {
-	// 10s 请求一次
+	// Poll once every 10 seconds
 	t := time.NewTicker(10 * time.Second)
 	defer t.Stop()
 	for {

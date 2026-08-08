@@ -92,11 +92,11 @@ export const defaultTheme = {
   brightWhite: '#eeeeec',
 };
 
-// 图片类型的
+// Image type
 export const FILE_SUFFIX_IMAGE = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp', 'ico', 'svg', 'heic', 'heif'];
-// 音频类型的
+// Audio type
 export const FILE_SUFFIX_AUDIO = ['mp3', 'wav', 'ogg', 'm4a', 'aac', 'flac', 'm4b', 'm4p', 'm4b', 'm4p', 'm4b', 'm4p'];
-// 视频类型的
+// Video type
 export const FILE_SUFFIX_VIDEO = [
   'mp4',
   'avi',
@@ -119,7 +119,7 @@ export const FILE_SUFFIX_VIDEO = [
   'm2t',
   'm2ts',
 ];
-// 压缩包类型的
+// Compressed archive type
 export const FILE_SUFFIX_COMPRESSION = [
   'zip',
   'rar',
@@ -143,7 +143,7 @@ export const FILE_SUFFIX_COMPRESSION = [
   'exe',
   'app',
 ];
-// 文档类型的
+// Document type
 export const FILE_SUFFIX_DOCUMENT = [
   'doc',
   'docx',
@@ -175,7 +175,7 @@ export const FILE_SUFFIX_DOCUMENT = [
   'lock',
   'sock',
 ];
-// 代码类型的
+// Code type
 export const FILE_SUFFIX_CODE = [
   'js',
   'ts',
@@ -209,9 +209,9 @@ export const FILE_SUFFIX_CODE = [
   'elixir',
   'ocaml',
 ];
-// 安装包类型的
+// Installer package type
 export const FILE_SUFFIX_INSTALL = ['deb', 'rpm', 'msi', 'exe', 'app', 'dmg', 'pkg', 'deb', 'rpm', 'msi', 'exe', 'app'];
-// 数据库类型
+// Database type
 export const FILE_SUFFIX_DATABASE = [
   'mysql',
   'oracle',

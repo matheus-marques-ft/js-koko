@@ -17,7 +17,7 @@ const (
 type WrapperTable struct {
 	Labels      []string
 	Fields      []string
-	FieldsSize  map[string][3]int // 列宽，列最小宽，列最大宽
+	FieldsSize  map[string][3]int // column width, column min width, column max width
 	Data        []map[string]string
 	TotalSize   int
 	TruncPolicy int
@@ -25,12 +25,12 @@ type WrapperTable struct {
 	totalSize   int
 	paddingSize int
 	bolderSize  int
-	fieldsSize  map[string]int // 计算后的最终宽度
+	fieldsSize  map[string]int // final width after calculation
 	Caption     string
 }
 
 func (t *WrapperTable) Initial() {
-	// 如果设置的宽度小于title的size， 重写
+	// if the configured width is smaller than the title's size, override it
 	if t.Labels == nil {
 		t.Labels = t.Fields
 	}
@@ -65,9 +65,9 @@ func (t *WrapperTable) CalculateColumnsSize() {
 		}
 	}
 
-	// 如果数据宽度大于设置最大值，则设置为准
-	// 如果数据最大值小彧最小值，已最小值为列宽
-	// 否则数据最大宽度为列宽
+	// if the data width is greater than the configured max, use the max
+	// if the data max value is less than the min value, use the min value as the column width
+	// otherwise the data's max width is used as the column width
 	for k, v := range dataColMaxSize {
 		size, min, max := t.FieldsSize[k][0], t.FieldsSize[k][1], t.FieldsSize[k][2]
 		if size != 0 {
@@ -81,7 +81,7 @@ func (t *WrapperTable) CalculateColumnsSize() {
 		}
 	}
 
-	// 计算后列总长度
+	// total column length after calculation
 	calSize := 0
 	for _, v := range t.fieldsSize {
 		calSize += v
@@ -91,10 +91,10 @@ func (t *WrapperTable) CalculateColumnsSize() {
 		return
 	}
 
-	// 总宽度计算时应当减去 border和padding
+	// when calculating the total width, border and padding should be subtracted
 	t.totalSize = t.TotalSize - len(t.Fields)*2*t.paddingSize - (len(t.Fields)+1)*t.bolderSize
 
-	// 计算可以扩容和缩容的列
+	// calculate the columns that can be expanded and shrunk
 	delta := t.totalSize - calSize
 	if delta == 0 {
 		return
@@ -109,12 +109,12 @@ func (t *WrapperTable) CalculateColumnsSize() {
 		for k, v := range t.FieldsSize {
 			size, min, max := v[0], v[1], v[2]
 			switch step {
-			// 扩容
+			// expand
 			case 1:
 				if size != 0 || (max != 0 && t.fieldsSize[k] >= max) {
 					continue
 				}
-			// 缩容
+			// shrink
 			case -1:
 				if size != 0 || t.fieldsSize[k] <= min {
 					continue

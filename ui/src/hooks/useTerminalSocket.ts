@@ -36,7 +36,7 @@ import { useTerminalEvents } from './useTerminalEvents';
 import { getXTerminalLineContent } from './helper/index';
 
 /**
- * @description 判断 WebSocket 是否关闭
+ * @description Check whether the WebSocket is closed
  * @param {WebSocket} socket
  * @returns {boolean}
  */
@@ -45,7 +45,7 @@ const isSocketClosing = (socket: WebSocket) => {
 };
 
 /**
- * @description 获取终端主题
+ * @description Get the terminal theme
  * @param {string} themeName
  */
 export const terminalTheme = (themeName: string) => {
@@ -95,7 +95,7 @@ export const useTerminalSocket = () => {
   const webglAddon = new WebglAddon();
   const searchAddon = new SearchAddon();
 
-  // 处理 webgl context 超过浏览器最大上下文时的处理
+  // Handle the case where the webgl context exceeds the browser's max context count
   // https://github.com/xtermjs/xterm.js/tree/master/addons/addon-webgl
   webglAddon.onContextLoss(() => {
     webglAddon.dispose();
@@ -137,7 +137,7 @@ export const useTerminalSocket = () => {
   }, 500);
 
   /**
-   * @description 分发 Socket 消息
+   * @description Dispatch socket messages
    */
 
   let lastMessage: string;
@@ -305,7 +305,7 @@ export const useTerminalSocket = () => {
       case MESSAGE_TYPE.TERMINAL_SHARE_JOIN: {
         const data = JSON.parse(parsedMessageData.data);
 
-        // data 中如果 primary 为 true 则表示是当前用户
+        // If `primary` is true in the data, it represents the current user
         onlineUsers.value.push(data);
 
         connectionStore.updateConnectionState({
@@ -386,7 +386,7 @@ export const useTerminalSocket = () => {
   };
 
   /**
-   * @description 终端 zmodem 处理二进制消息
+   * @description Terminal zmodem handling of binary messages
    * @param {MessageEvent} socketMessage
    */
   const handleBinaryMessage = (socketMessage: MessageEvent) => {
@@ -411,7 +411,7 @@ export const useTerminalSocket = () => {
   };
 
   /**
-   * @description 监听 socket 事件
+   * @description Listen for socket events
    */
   const listenSocketEvent = () => {
     if (!socketRef.value) {
@@ -463,7 +463,7 @@ export const useTerminalSocket = () => {
   };
 
   /**
-   * @description 监听挂载节点事件
+   * @description Listen for events on the mounted node
    */
   const listenElEvent = () => {
     if (!terminalRef.value) {
@@ -478,8 +478,8 @@ export const useTerminalSocket = () => {
       terminalRef.value!.focus();
     });
     containerRef.value!.addEventListener('contextmenu', async (e: MouseEvent) => {
-      // 只有在开启右键快速复制时才允许粘贴
-      // TODO 对于 terminal 的 contextmenu 后续需要进行封装
+      // Only allow paste when right-click quick paste is enabled
+      // TODO the terminal's contextmenu should be encapsulated in the future
       if (e.ctrlKey || terminalSettingsStore.quickPaste !== '1') return;
 
       e.preventDefault();
@@ -546,7 +546,7 @@ export const useTerminalSocket = () => {
       });
     });
 
-    // 监听 ctrl + f 或 command + f 快捷键
+    // Listen for the ctrl+f or command+f shortcut
     containerRef.value!.addEventListener('keydown', (e: KeyboardEvent) => {
       if (e.ctrlKey || e.metaKey) {
         if (e.key === 'f') {
@@ -558,7 +558,7 @@ export const useTerminalSocket = () => {
   };
 
   /**
-   * @description 监听 terminalRef 事件
+   * @description Listen for terminalRef events
    */
   const listenTerminalRefEvent = () => {
     if (!terminalRef.value || !socketRef.value) {
@@ -575,7 +575,8 @@ export const useTerminalSocket = () => {
       const isZmodemInterrupt = isActiveSession() && data.length === 1 && data.charCodeAt(0) === AsciiCtrlC;
       const processedData = isZmodemInterrupt ? data : preprocessInput(data, terminalSettingsStore.getConfig);
       if (isZmodemInterrupt) {
-        // 先停止浏览器端传输，使 CAN 排在已缓冲的文件数据之后，再发送 Ctrl-C。
+        // Stop the browser-side transfer first so CAN is queued after the buffered file data,
+        // then send Ctrl-C.
         abortActiveSession();
       }
       socketRef.value!.send(formatMessage('', FORMATTER_MESSAGE_TYPE.TERMINAL_DATA, processedData));
@@ -602,39 +603,39 @@ export const useTerminalSocket = () => {
         return false;
       }
 
-      // 允许复制操作而不是发送中断信号
+      // Allow the copy action instead of sending an interrupt signal
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'c' && terminalRef.value?.hasSelection()) {
         return false;
       }
 
-      // 阻止默认的粘贴行为，粘贴数据通过 socket 写入
+      // Prevent the default paste behavior; paste data is written through the socket instead
       return !((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'v');
     });
   };
 
   /**
-   * @description 创建终端
+   * @description Create the terminal
    */
   const createTerminal = () => {
     const terminal: Terminal = new Terminal({
-      // 基础配置
+      // Basic config
       fontSize: defaultTerminalCfg.fontSize,
       fontFamily: defaultTerminalCfg.fontFamily,
       lineHeight: defaultTerminalCfg.lineHeight,
 
-      // 光标配置
+      // Cursor config
       cursorBlink: true,
       cursorStyle: 'block',
       rightClickSelectsWord: true,
 
-      // 滚动配置
+      // Scroll config
       scrollback: 5000,
       scrollOnUserInput: true,
 
-      // 主题配置
+      // Theme config
       theme: terminalTheme(defaultTerminalCfg.themeName),
 
-      // 性能优化
+      // Performance optimization
       allowProposedApi: true,
       customGlyphs: true,
     });
@@ -662,7 +663,8 @@ export const useTerminalSocket = () => {
     event.preventDefault();
     event.stopPropagation();
     lastSendTime.value = new Date();
-    // session.abort() 会先把 CAN 追加到 WebSocket 队列尾部，避免残留文件块落入普通 shell。
+    // session.abort() first appends CAN to the tail of the WebSocket queue, preventing leftover
+    // file chunks from landing in the plain shell.
     abortActiveSession();
     socketRef.value.send(
       formatMessage('', FORMATTER_MESSAGE_TYPE.TERMINAL_DATA, String.fromCharCode(AsciiCtrlC)),
@@ -671,7 +673,7 @@ export const useTerminalSocket = () => {
   };
 
   /**
-   * @description 创建 WebSocket 连接
+   * @description Create the WebSocket connection
    */
   const createWebSocket = () => {
     const url = generateWsURL();

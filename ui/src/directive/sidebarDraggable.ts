@@ -8,7 +8,7 @@ export const draggable = {
     const mouseMoveHandler = (event: MouseEvent) => {
       const newWidth = startWidth + (event.clientX - startX);
 
-      // 确保宽度在合理范围内
+      // Ensure the width stays within a reasonable range
       if (newWidth >= 300 && newWidth <= 600) {
         el.style.width = `${newWidth}px`;
 
@@ -27,7 +27,7 @@ export const draggable = {
 
     const mouseDownHandler = (event: MouseEvent) => {
       const rect = el.getBoundingClientRect();
-      // 只有在右侧边缘10px范围内拖动才触发
+      // Only trigger when dragging within 10px of the right edge
       if (event.clientX >= rect.right - 10 && event.clientX <= rect.right) {
         startX = event.clientX;
         startWidth = el.offsetWidth;

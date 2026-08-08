@@ -135,14 +135,14 @@ function buildContainerSearchTree(nodes: TreeOption[], pattern: string): { data:
     for (const child of children) visit(child);
   };
 
-  // 构建搜索内容节点
+  // Build the search content nodes
   for (const node of nodes) visit(node);
 
   if (matchedContainers.length === 0) {
     return { data: [], expandedKeys: [] };
   }
 
-  // 额外增加一个空的父节点
+  // Additionally add an empty parent node
   const rootNode: TreeOption = {
     label: '',
     key: searchRootKey,
@@ -206,7 +206,7 @@ const showToolTip = (option: TreeOption) => {
 };
 
 /**
- * @description 处理节点展开
+ * @description Handle node expansion
  */
 function handleExpandCollapse(
   expandedKeys: string[],
@@ -232,7 +232,7 @@ function handleExpandCollapse(
 }
 
 /**
- * 处理节点行为
+ * Handle node behavior
  */
 function nodeProps({ option }: { option: TreeOption }) {
   return {
@@ -259,7 +259,7 @@ function nodeProps({ option }: { option: TreeOption }) {
 }
 
 /**
- * 过滤右键菜单行为
+ * Filter the context menu behavior
  *
  * @param option
  */
@@ -288,7 +288,7 @@ function handleFilter(option: TreeOption) {
 }
 
 /**
- * 右键菜单触发行为
+ * Context menu trigger behavior
  *
  * @param key
  * @param _option
@@ -308,7 +308,7 @@ function handleSelect(key: string, _option: DropdownOption) {
           action: 'expand',
         });
 
-        // 原本的异步加载方法，现在用于自动将宽度展开
+        // The original async load method, now used to automatically expand the width
         emits('syncLoadNode');
       }
       // handleOnLoad(currentNodeInfo.value);
@@ -322,7 +322,7 @@ function handleSelect(key: string, _option: DropdownOption) {
 }
 
 /**
- * 根节点连接
+ * Root node connection
  */
 function handleRootLink(e: Event) {
   e.stopPropagation();

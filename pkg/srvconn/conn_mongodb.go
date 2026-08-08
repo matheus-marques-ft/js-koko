@@ -139,7 +139,7 @@ func addMongoParamsWithSSL(args *sqlOption, params map[string]string) {
 }
 
 func (opt *sqlOption) GetAuthSource() string {
-	//  authSource 默认是 admin，通过 platform 的 protocol 设置，修改这个认证的值
+	//  authSource defaults to admin; this auth value can be changed via the platform's protocol settings
 	// https://www.mongodb.com/docs/manual/reference/connection-string/#mongodb-urioption-urioption.authSource
 	if opt.AuthSource == "" {
 		return "admin"

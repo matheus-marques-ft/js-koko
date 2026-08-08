@@ -76,7 +76,7 @@ func domainsAllowOrigin(originHost, domains string) bool {
 
 func checkOrigin(r *http.Request) bool {
 	origin := r.Header.Get("Origin")
-	// 允许非浏览器，客户端访问
+	// allow access from non-browser clients
 	if len(origin) == 0 {
 		return true
 	}
@@ -253,7 +253,7 @@ func (s *Server) UpgradeUserWsConn(ctx *gin.Context) (*UserWebsocket, error) {
 		langCode = cookieLang
 	}
 
-	//设置 websocket 协议层面对应的ping和pong 处理方法
+	// set up the ping and pong handlers at the websocket protocol level
 	underWsCon.SetPingHandler(func(appData string) error {
 		logger.Debugf("Websocket ping %s", appData)
 		return wsSocket.WritePong([]byte(appData), maxWriteTimeOut)
@@ -319,7 +319,7 @@ func (s *Server) getPublicSetting() model.PublicSetting {
 
 func ParseAcceptLanguageCode(language string) string {
 	// en,zh-TW;q=0.9,zh-CN;q=0.8,zh;q=0.7
-	// 解析出第一个语言代码
+	// parse out the first language code
 	if language == "" {
 		return "zh-CN"
 	}

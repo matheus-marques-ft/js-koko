@@ -320,7 +320,7 @@ func execContainerShell(k8sClient *kubernetes.Clientset, k8sCfg *rest.Config, c 
 		TerminalSizeQueue: c.slaver,
 		Tty:               true,
 	}
-	// 这个 stream 是阻塞的方法
+	// This stream call is a blocking method
 	err = exec.Stream(streamOption)
 	return err
 }

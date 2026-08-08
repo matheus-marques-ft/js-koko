@@ -49,7 +49,7 @@ func (u *UserSelectHandler) displayAssetResult(searchHeader string) {
 	u.displayAssets(searchHeader)
 }
 
-const maxFieldSize = 80 // 仅仅是限制字段显示长度最大为 80
+const maxFieldSize = 80 // just limits the maximum display length of a field to 80
 
 func (u *UserSelectHandler) displayAssets(searchHeader string) {
 	currentResult := u.currentResult
@@ -72,7 +72,7 @@ func (u *UserSelectHandler) displayAssets(searchHeader string) {
 		row := make(map[string]string)
 		idNumber := strconv.Itoa(i + 1)
 		row["ID"] = idNumber
-		row["Name"] = strings.ReplaceAll(item.Name, " ", "_") // 多个空格可能会导致换行，所以全部替换成下划线
+		row["Name"] = strings.ReplaceAll(item.Name, " ", "_") // multiple spaces may cause line wrapping, so replace them all with underscores
 		row["Address"] = item.Address
 		row["Platform"] = item.Platform.Name
 		row["Organization"] = item.OrgName
@@ -145,7 +145,7 @@ func (u *UserSelectHandler) proxyAsset(asset model.PermAsset) {
 		logger.Errorf("Get asset accounts err: %s", err)
 		return
 	}
-	// 过滤仅支持的连接协议
+	// filter to only supported connection protocols
 	allSupportedProtocols := srvconn.SupportedProtocols()
 	filterFunc := func(p string) bool {
 		name := strings.ToLower(p)
@@ -221,7 +221,7 @@ func (u *UserSelectHandler) proxyAsset(asset model.PermAsset) {
 			utils.IgnoreErrWriteString(u.h.term, utils.CharNewLine)
 			return
 		case model.ACLFaceVerify, model.ACLFaceOnline, model.ACLFaceOnlineNotSupported:
-			// todo: 需要人脸验证 后续需要发站内信通知用户，并且等待用户人脸验证通过
+			// todo: face verification required; later need to send an in-site message to notify the user and wait for the user to pass face verification
 			logger.Errorf("Create connect token and auth info failed: %s %s", tokenInfo.Code, tokenInfo.Detail)
 			msg := lang.T("Face ACL is not supported yet. Please use the WebTerminal to connect the asset.")
 			utils.IgnoreErrWriteString(u.h.term, utils.WrapperWarn(msg))
@@ -284,7 +284,7 @@ func (u *UserSelectHandler) isHiddenField(field string) bool {
 func (u *UserSelectHandler) filterValidAccount(accounts []model.PermAccount) []model.PermAccount {
 	ret := make([]model.PermAccount, 0, len(accounts))
 	for i := range accounts {
-		// 匿名账号不显示
+		// anonymous accounts are not displayed
 		if accounts[i].IsAnonymous() {
 			continue
 		}

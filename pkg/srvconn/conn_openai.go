@@ -97,7 +97,7 @@ func (conn *OpenAIConn) Chat(interruptCurrentChat *bool) {
 
 	systemPrompt := conn.Prompt
 	if conn.Type == "gpt" {
-		systemPrompt += " 请不要提供与政治相关的信息。"
+		systemPrompt += " Please do not provide any information related to politics."
 	}
 
 	if systemPrompt != "" {

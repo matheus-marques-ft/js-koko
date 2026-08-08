@@ -256,7 +256,7 @@ func (r *ReplyRecorder) UploadGzipFile(maxRetry int) {
 		failureMsg := strings.ReplaceAll(err.Error(), ",", " ")
 		r.recordLifecycleLog(model.ReplayUploadFailure, failureMsg)
 		logger.Errorf("Upload replay file err: %s", err)
-		// 如果还是失败，上传 server 再传一次
+		// If it still fails, upload to the server again
 		if i == maxRetry {
 			if r.storage.TypeName() == "server" {
 				reason := model.SessionReplayErrUploadFailed
@@ -457,7 +457,7 @@ func (r *FTPFileRecorder) UploadFile(maxRetry int, ftpLogId string) {
 			break
 		}
 		logger.Errorf("Upload FTP file err: %s", err)
-		// 如果还是失败，上传 server 再传一次
+		// If it still fails, upload to the server again
 		if i == maxRetry {
 			if r.storage.TypeName() == "server" {
 				break

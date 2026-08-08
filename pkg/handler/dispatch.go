@@ -27,7 +27,7 @@ func (h *InteractiveHandler) Dispatch() {
 		checkChan <- false
 		line = strings.TrimSpace(line)
 		if len(line) == 0 {
-			// 当 只是回车 空字符单独处理
+			// handle the case where only Enter is pressed (empty string) separately
 			if initialed {
 				h.selectHandler.MoveNextPage()
 			} else {
@@ -60,7 +60,7 @@ func (h *InteractiveHandler) Dispatch() {
 				h.selectHandler.MoveNextPage()
 				continue
 			case "g":
-				h.wg.Wait() // 等待node加载完成
+				h.wg.Wait() // wait for node loading to complete
 				h.displayNodeTree(h.nodes)
 				continue
 			case "?":
@@ -100,7 +100,7 @@ func (h *InteractiveHandler) Dispatch() {
 			case strings.Index(line, "g") == 0:
 				searchWord := strings.TrimSpace(strings.TrimPrefix(line, "g"))
 				if num, err := strconv.Atoi(searchWord); err == nil {
-					h.wg.Wait() // 等待node加载完成
+					h.wg.Wait() // wait for node loading to complete
 					if num > 0 && num <= len(h.nodes) {
 						selectedNode := h.nodes[num-1]
 						h.selectHandler.SetNode(selectedNode)

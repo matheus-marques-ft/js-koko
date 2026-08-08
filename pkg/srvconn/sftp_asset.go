@@ -103,7 +103,7 @@ func generateSubAccountsFolderMap(accounts []model.PermAccount) map[string]*mode
 		return ok
 	}
 	for i := 0; i < len(accounts); i++ {
-		//  不支持 @USER 和 @INPUT，
+		//  @USER and @INPUT are not supported,
 		switch accounts[i].Username {
 		case model.InputUser, model.DynamicUser, model.ANONUser:
 			logger.Debugf("Skip unSupported account %s", accounts[i].Name)
@@ -295,7 +295,7 @@ func (ad *AssetDir) ReadDir(path string) (res []os.FileInfo, err error) {
 		if !ad.ShowHidden && strings.HasPrefix(info.Name(), ".") {
 			continue
 		}
-		//  兼容 MobaXterm, 打开软连接目录
+		//  Compatible with MobaXterm, open the symlink directory
 		if info.Mode()&os.ModeSymlink != 0 {
 			linkPath := filepath.Join(realPath, info.Name())
 			linkInfo, err1 := con.client.Stat(linkPath)
@@ -677,7 +677,7 @@ func (ad *AssetDir) createConnectToken(su *model.PermAccount) (model.ConnectToke
 		ConnectMethod: model.ProtocolSFTP,
 		RemoteAddr:    ad.opts.RemoteAddr,
 	}
-	// sftp 不支持 ACL 复核的资产，需要从 web terminal 中登录
+	// sftp does not support assets requiring ACL review; login must go through the web terminal
 	tokenInfo, err := ad.jmsService.CreateSuperConnectToken(&req)
 	if err != nil {
 		msg := err.Error()
@@ -733,7 +733,7 @@ func (ad *AssetDir) getNewSftpConn(connectToken *model.ConnectToken,
 	case "home", "~", "":
 		sftpRoot = homeDirPath
 	default:
-		//  ${ACCOUNT} 连接的账号用户名, ${USER} 当前用户用户名, ${HOME} 当前家目录
+		//  ${ACCOUNT} the username of the connecting account, ${USER} the current user's username, ${HOME} the current home directory
 		homeDir := homeDirPath
 		sftpRoot = strings.ReplaceAll(sftpRoot, "${ACCOUNT}", accountUsername)
 		sftpRoot = strings.ReplaceAll(sftpRoot, "${USER}", username)
@@ -879,9 +879,9 @@ func (ad *SftpFileInfo) Size() int64 {
 }
 
 /*
-	特殊处理：
-		如果是 root 账号，获取的目录信息，手动修改其文件权限可读写,
-		允许其在 web sftp 可以上传文件
+	Special handling:
+		If it is the root account, manually change the retrieved directory info's file permissions to readable/writable,
+		to allow it to upload files in web sftp
 */
 
 func (ad *SftpFileInfo) Mode() os.FileMode {

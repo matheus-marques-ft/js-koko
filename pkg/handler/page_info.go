@@ -20,7 +20,7 @@ func (p *pageInfo) updatePageInfo(pageSiz, totalCount, offset int) {
 }
 
 func (p *pageInfo) update() {
-	// 根据 pageSize和total值 更新  totalPage currentPage
+	// update totalPage and currentPage based on pageSize and total
 	if p.pageSize <= 0 {
 		p.totalPage = 1
 		p.currentPage = 1

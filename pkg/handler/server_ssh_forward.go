@@ -59,7 +59,7 @@ func (s *Server) HandleSSHRequest(ctx ssh.Context, srv *ssh.Server, req *gossh.R
 			var tokenInfo *model.ConnectToken
 			var err error
 			if directRequest.IsToken() {
-				// connection token 的方式使用 vscode 连接
+				// use the connection token approach to connect with vscode
 				tokenInfo = directRequest.ConnectToken
 				matchedProtocol := tokenInfo.Protocol == model.ProtocolSSH
 				assetSupportedSSH := tokenInfo.Asset.IsSupportProtocol(model.ProtocolSSH)

@@ -12,11 +12,11 @@ import (
 
 const (
 	UnAuth            = "unable to authenticate"
-	ConnectRefusedErr = "connection refused" // 无监听端口或者端口被防火墙阻断
+	ConnectRefusedErr = "connection refused" // No listening port, or the port is blocked by a firewall
 	IoTimeoutErr      = "i/o timeout"
 	NoRouteErr        = "No route to host" //
 
-	LoginFailed = "failed login" // telnet 连接失败
+	LoginFailed = "failed login" // telnet connection failed
 
 	networkUnreachable = "network is unreachable"
 )

@@ -123,7 +123,7 @@ func (u *UserSelectHandler) SetNode(node model.Node) {
 }
 
 func (u *UserSelectHandler) SetAllLocalData(data []model.PermAsset) {
-	// 使用副本
+	// use a copy
 	u.allLocalData = make([]model.PermAsset, len(data))
 	copy(u.allLocalData, data)
 }
@@ -182,7 +182,7 @@ func (u *UserSelectHandler) SearchOrProxy(key string) {
 		return
 	}
 
-	// 资产类型, 返回结果 ip 或者 hostname 与 key 完全一样则直接登录
+	// asset type: if the returned result's ip or hostname exactly matches key, log in directly
 	switch u.currentType {
 	case TypeAsset:
 		if strings.TrimSpace(key) != "" {

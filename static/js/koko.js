@@ -21,7 +21,7 @@ function decodeToStr(octets) {
     return decodeURIComponent(escape(String.fromCharCode.apply(null, octets)));
 }
 
-let DISABLE_RZ_SZ = false; // 监控页面将忽略上传下载 rz、sz
+let DISABLE_RZ_SZ = false; // On the monitor page, rz/sz uploads/downloads are ignored
 
 function initTerminal(elementId) {
     if (window.innerHeight === 0) {
@@ -59,7 +59,7 @@ function initTerminal(elementId) {
         term.scrollToBottom()
     })
     var zsentry;
-    // patch send_block_files 能够显示上传进度
+    // patch send_block_files so upload progress can be displayed
     Zmodem.Browser.send_block_files = function (session, files, options) {
         return send_block_files(session, files, options);
     };
@@ -81,15 +81,15 @@ function initTerminal(elementId) {
             var zsession = detection.confirm();
             term.write("\r\n")
             if (zsession.type === "send") {
-                // 动态创建 input 标签，否则选择相同的文件，不会触发 onchang 事件
+                // Dynamically create the input tag, otherwise selecting the same file again won't trigger the onchange event
                 file_input_el = document.createElement("input");
                 file_input_el.type = "file";
-                file_input_el.style.display = "none";//隐藏
+                file_input_el.style.display = "none";//hidden
                 document.body.appendChild(file_input_el);
                 document.body.onfocus = function () {
                     document.body.onfocus = null;
                     setTimeout(function () {
-                        // 如果未选择任何文件，则代表取消上传。主动取消
+                        // If no file was selected, treat it as a cancelled upload. Abort actively
                         if (file_input_el.files.length === 0) {
                             console.log("Cancel file clicked")
                             if (!zsession.aborted()) {
@@ -114,7 +114,7 @@ function initTerminal(elementId) {
     });
 
     function resizeTerminal() {
-        // 延迟调整窗口大小
+        // Debounce window resize
         if (resizeTimer != null) {
             clearTimeout(resizeTimer);
         }
@@ -318,7 +318,7 @@ function _handle_receive_session(zsession) {
             xfer.on("input", (payload) => {
                 _update_progress(xfer, 'download');
                 if (DISABLE_RZ_SZ) {
-                    console.log("监控状态，忽略rz sz 下载文件")
+                    console.log("Monitor mode, ignoring rz/sz file download")
                     return
                 }
                 FILE_BUFFER.push(new Uint8Array(payload));
@@ -326,7 +326,7 @@ function _handle_receive_session(zsession) {
             xfer.accept().then(
                 () => {
                     if (DISABLE_RZ_SZ) {
-                        console.log("监控状态，忽略rz sz 下载文件")
+                        console.log("Monitor mode, ignoring rz/sz file download")
                         return
                     }
                     _save_to_disk(xfer, FILE_BUFFER);
@@ -421,7 +421,7 @@ function _handle_send_session(file_el, zsession) {
         };
         if (DISABLE_RZ_SZ) {
             zsession.abort();
-            console.log("监控状态，忽略rz sz 上传文件")
+            console.log("Monitor mode, ignoring rz/sz file upload")
             return
         }
         file_el.click();
@@ -430,8 +430,8 @@ function _handle_send_session(file_el, zsession) {
     return promise;
 }
 
-let MAX_TRANSFER_SIZE = 1024 * 1024 * 500 // 默认最大上传下载500M
-// let MAX_TRANSFER_SIZE = 1024 * 1024 * 5 // 测试 上传下载最大size 5M
+let MAX_TRANSFER_SIZE = 1024 * 1024 * 500 // Default max upload/download 500M
+// let MAX_TRANSFER_SIZE = 1024 * 1024 * 5 // Test max upload/download size 5M
 
 function _validate_transfer_file_size(xfer) {
     let detail = xfer.get_details();

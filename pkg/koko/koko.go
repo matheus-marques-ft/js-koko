@@ -101,7 +101,7 @@ func MustJMService() *service.JMService {
 		service.JMSAccessKey(key.ID, key.Secret),
 	)
 	if err != nil {
-		logger.Fatal("创建JMS Service 失败 " + err.Error())
+		logger.Fatal("Failed to create JMS Service " + err.Error())
 		os.Exit(1)
 	}
 	return jmsService
@@ -113,7 +113,7 @@ func MustLoadValidAccessKey() model.AccessKey {
 	if err := key.LoadFromFile(conf.AccessKeyFilePath); err != nil {
 		return MustRegisterTerminalAccount()
 	}
-	// 校验accessKey
+	// validate accessKey
 	return MustValidKey(key)
 }
 
@@ -130,11 +130,11 @@ func MustRegisterTerminalAccount() (key model.AccessKey) {
 		key.ID = terminal.ServiceAccount.AccessKey.ID
 		key.Secret = terminal.ServiceAccount.AccessKey.Secret
 		if err := key.SaveToFile(conf.AccessKeyFilePath); err != nil {
-			logger.Error("保存key失败: " + err.Error())
+			logger.Error("Failed to save key: " + err.Error())
 		}
 		return key
 	}
-	logger.Error("注册终端失败退出")
+	logger.Error("Failed to register terminal, exiting")
 	os.Exit(1)
 	return
 }
@@ -148,14 +148,14 @@ func MustValidKey(key model.AccessKey) model.AccessKey {
 				logger.Error("Access key unauthorized, try to register new access key")
 				return MustRegisterTerminalAccount()
 			default:
-				logger.Error("校验 access key failed: " + err.Error())
+				logger.Error("Validate access key failed: " + err.Error())
 			}
 			time.Sleep(5 * time.Second)
 			continue
 		}
 		return key
 	}
-	logger.Error("校验 access key failed退出")
+	logger.Error("Validate access key failed, exiting")
 	os.Exit(1)
 	return key
 }

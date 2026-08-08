@@ -19,7 +19,7 @@ const props = defineProps<{
   hiddenFileManager?: boolean;
 }>();
 
-// 15s 最大等待时间
+// 15s max wait time
 const MAX_WAIT_TIME = 1000 * 15;
 
 const { t } = useI18n();
@@ -59,7 +59,7 @@ watch(
   () => hasToken.value,
   newVal => {
     if (newVal) {
-      // 为 true 则获取到 token
+      // If true, the token has been obtained
       isRequestingToken.value = false;
       showEmpty.value = false;
 

@@ -70,7 +70,7 @@ const keyboardList = reactive<KeyboardItem[]>([
 
 function writeDataToTerminal(type: string) {
   if (isK8sEnvironment.value) {
-    // K8s 环境：根据当前 tab 获取对应的 terminal 实例
+    // K8s environment: get the corresponding terminal instance based on the current tab
     const currentTab = terminalStore.currentTab;
 
     if (!currentTab) {
@@ -86,18 +86,18 @@ function writeDataToTerminal(type: string) {
       return;
     }
 
-    // 直接向当前活跃的终端写入内容
+    // Write directly to the currently active terminal
     terminal.paste(type);
     terminal.focus();
   } else {
-    // 普通连接：使用原有的 mittBus 事件机制
+    // Normal connection: use the existing mittBus event mechanism
     mittBus.emit('write-command', { type });
   }
 }
 
 onMounted(() => {
   // const off = onTerminalSession((info: TerminalSessionInfo) => {
-  // 这里拿到终端会话数据 info
+  // Terminal session data info is obtained here
   //   console.log('session info:', info);
   //   assetName.value = info.session.asset;
   //   accontName.value = info.session.user;
@@ -107,19 +107,19 @@ onMounted(() => {
 
 <template>
   <n-flex vertical align="center">
-    <!-- <CardContainer title="连接详情">
+    <!-- <CardContainer title="Connection Details">
       <n-descriptions label-placement="left" bordered :column="1">
-        <n-descriptions-item label="IP"> 苹果 </n-descriptions-item>
-        <n-descriptions-item label="资产名称">
+        <n-descriptions-item label="IP"> Apple </n-descriptions-item>
+        <n-descriptions-item label="Asset Name">
           {{ assetName }}
         </n-descriptions-item>
-        <n-descriptions-item label="账号名称">
+        <n-descriptions-item label="Account Name">
           {{ accontName }}
         </n-descriptions-item>
-        <n-descriptions-item label="最大空闲时间"> 苹果 </n-descriptions-item>
-        <n-descriptions-item label="授权过期时间"> 苹果 </n-descriptions-item>
-        <n-descriptions-item label="最大会话时间"> 苹果 </n-descriptions-item>
-        <n-descriptions-item label="当前已连接时间"> 苹果 </n-descriptions-item>
+        <n-descriptions-item label="Max Idle Time"> Apple </n-descriptions-item>
+        <n-descriptions-item label="Authorization Expiration Time"> Apple </n-descriptions-item>
+        <n-descriptions-item label="Max Session Time"> Apple </n-descriptions-item>
+        <n-descriptions-item label="Current Connected Time"> Apple </n-descriptions-item>
       </n-descriptions>
     </CardContainer> -->
 

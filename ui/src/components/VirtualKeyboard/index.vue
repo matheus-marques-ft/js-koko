@@ -5,10 +5,10 @@ interface VirtualKey {
   label: string;
   sequence?: string;
   type: 'modifier' | 'control' | 'char' | 'navigation';
-  width?: number; // 键位宽度，以标准键为1单位
+  width?: number; // Key width, in units of 1 standard key
 }
 
-// 键盘状态
+// Keyboard state
 const keyboardState = ref({
   isShiftPressed: false,
   isCtrlPressed: false,
@@ -17,10 +17,10 @@ const keyboardState = ref({
   capsLock: false,
 });
 
-// 检测是否为Mac系统
+// Detect whether the system is Mac
 const isMac = navigator.platform.toUpperCase().includes('MAC');
 
-// 主键盘区域
+// Main keyboard area
 const mainKeyboard = {
   row1: [
     { label: '1', type: 'char' as const },
@@ -38,7 +38,7 @@ const mainKeyboard = {
     { label: 'Backspace', sequence: '\x7F', type: 'control' as const, width: 2.5 },
     { label: '↑', sequence: '\x1B[A', type: 'navigation' as const },
   ],
-  // 第二行：QWERTY第一行
+  // Row 2: QWERTY row 1
   row2: [
     { label: 'Tab', sequence: '\t', type: 'control' as const, width: 1.5 },
     { label: 'Q', type: 'char' as const },
@@ -56,7 +56,7 @@ const mainKeyboard = {
     { label: '\\', type: 'char' as const, width: 1 },
     { label: '↓', sequence: '\x1B[B', type: 'navigation' as const },
   ],
-  // 第三行：ASDF第二行
+  // Row 3: ASDF row 2
   row3: [
     { label: 'Caps', type: 'control' as const, width: 1.75 },
     { label: 'A', type: 'char' as const },
@@ -73,7 +73,7 @@ const mainKeyboard = {
     { label: 'Enter', sequence: '\r', type: 'control' as const, width: 1.75 },
     { label: '→', sequence: '\x1B[C', type: 'navigation' as const },
   ],
-  // 第四行：ZXCV第三行
+  // Row 4: ZXCV row 3
   row4: [
     { label: 'Shift', type: 'modifier' as const, width: 2.25 },
     { label: 'Z', type: 'char' as const },
@@ -89,7 +89,7 @@ const mainKeyboard = {
     { label: 'Shift', type: 'modifier' as const, width: 2.25 },
     { label: '←', sequence: '\x1B[D', type: 'navigation' as const },
   ],
-  // 第五行：修饰键和空格（根据系统调整）
+  // Row 5: modifier keys and spacebar (adjusted per system)
   row5: [
     { label: 'Ctrl', type: 'modifier' as const, width: 1.25 },
     { label: isMac ? 'Cmd' : 'Alt', type: 'modifier' as const, width: 1.25 },
@@ -101,7 +101,7 @@ const mainKeyboard = {
   ],
 };
 
-// 获取按键样式
+// Get the key style
 const getKeyStyle = (key: VirtualKey) => {
   const width = key.width || 1;
   return {
@@ -110,14 +110,14 @@ const getKeyStyle = (key: VirtualKey) => {
   };
 };
 
-// 处理按键点击
+// Handle key clicks
 const handleKeyClick = (_key: VirtualKey) => {
-  // 这里可以添加实际的按键处理逻辑
-  // 比如发送到终端、触发快捷键等
-  // console.log('按键点击:', _key);
+  // Actual key-handling logic can be added here,
+  // such as sending to the terminal, triggering shortcuts, etc.
+  // console.log('Key clicked:', _key);
 };
 
-// 处理修饰键状态
+// Handle modifier key state
 const handleModifierKey = (key: VirtualKey) => {
   switch (key.label) {
     case 'Shift':
@@ -138,7 +138,7 @@ const handleModifierKey = (key: VirtualKey) => {
   }
 };
 
-// 处理按键综合点击事件
+// Handle combined key click events
 const onKeyClick = (key: VirtualKey) => {
   if (key.type === 'modifier' || key.label === 'Caps') {
     handleModifierKey(key);
@@ -150,7 +150,7 @@ const onKeyClick = (key: VirtualKey) => {
 <template>
   <n-card :style="{ width: '1000px' }" bordered>
     <div class="main-keyboard flex-1">
-      <!-- 第一行：数字键 -->
+      <!-- Row 1: number keys -->
       <div class="flex gap-1 mb-1 justify-start">
         <n-button
           v-for="key in mainKeyboard.row1"
@@ -165,7 +165,7 @@ const onKeyClick = (key: VirtualKey) => {
         </n-button>
       </div>
 
-      <!-- 第二行：QWERTY第一行 -->
+      <!-- Row 2: QWERTY row 1 -->
       <div class="flex gap-1 mb-1 justify-start">
         <n-button
           v-for="key in mainKeyboard.row2"
@@ -180,7 +180,7 @@ const onKeyClick = (key: VirtualKey) => {
         </n-button>
       </div>
 
-      <!-- 第三行：ASDF第二行 -->
+      <!-- Row 3: ASDF row 2 -->
       <div class="flex gap-1 mb-1 justify-start">
         <n-button
           v-for="key in mainKeyboard.row3"
@@ -195,7 +195,7 @@ const onKeyClick = (key: VirtualKey) => {
         </n-button>
       </div>
 
-      <!-- 第四行：ZXCV第三行 -->
+      <!-- Row 4: ZXCV row 3 -->
       <div class="flex gap-1 mb-1 justify-start">
         <n-button
           v-for="key in mainKeyboard.row4"
@@ -210,7 +210,7 @@ const onKeyClick = (key: VirtualKey) => {
         </n-button>
       </div>
 
-      <!-- 第五行：修饰键和空格 -->
+      <!-- Row 5: modifier keys and spacebar -->
       <div class="flex gap-1 mb-1 justify-start">
         <n-button
           v-for="key in mainKeyboard.row5"

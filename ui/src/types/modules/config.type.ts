@@ -38,7 +38,7 @@ export interface SettingConfig {
 }
 
 export interface ITerminalProps {
-  // 主题名称
+  // Theme name
   themeName?: string;
 
   terminalType: string;

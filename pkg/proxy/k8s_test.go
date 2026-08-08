@@ -59,7 +59,7 @@ func TestK8sResourceTree_ResultTest(t *testing.T) {
 }
 
 func TestK8sTreeGen_SpeedTest(t *testing.T) {
-	mockedData := GenPodLines(30000) // 模拟企业级生产环境小集群架构下的k8s规模
+	mockedData := GenPodLines(30000) // Simulate the k8s scale of a small cluster in an enterprise-grade production environment
 
 	var duration1, duration2 int64
 	st1 := time.Now()
@@ -205,29 +205,29 @@ func v1(podLines []string) map[string]*Namespace {
 	return namespaces
 }
 
-// 模拟大规模的生产环境的k8s集群数据
+// Simulate large-scale k8s cluster data for a production environment
 //
 //nolint:gosec
 func GenPodLines(scale int) []string {
 	lines := make([]string, scale)
 
-	// 预生成命名空间列表（约100个不同的ns）
+	// Pre-generate the namespace list (about 100 distinct namespaces)
 	nsList := make([]string, 100)
 	for i := range nsList {
 		nsList[i] = genNsName()
 	}
 
-	// 真实集群的典型分布模式
+	// Typical distribution pattern of a real cluster
 	for i := 0; i < scale; i++ {
 		var ns string
 		switch {
-		case i < scale/20: // 5% 系统组件
+		case i < scale/20: // 5% system components
 			ns = choice([]string{"kube-system", "kube-public", "istio-system"})
-		case i < scale/100*15: // 15% 监控日志
+		case i < scale/100*15: // 15% monitoring/logging
 			ns = choice([]string{"monitoring", "logging", "security"})
-		case i < scale/2: // 50% 业务应用
-			ns = nsList[CryptoRandInt(30)+20] // 使用前50个业务ns
-		default: // 30% 其他
+		case i < scale/2: // 50% business applications
+			ns = nsList[CryptoRandInt(30)+20] // Use the first 50 business namespaces
+		default: // 30% other
 			ns = nsList[CryptoRandInt(len(nsList))]
 		}
 
@@ -240,7 +240,7 @@ func GenPodLines(scale int) []string {
 	return lines
 }
 
-// 生成命名空间名称
+// Generate a namespace name
 //
 //nolint:gosec
 func genNsName() string {
@@ -252,7 +252,7 @@ func genNsName() string {
 	return fmt.Sprintf("%s-%s-%s", prefix, choice([]string{"web", "api", "data", "mobile"}), suffix)
 }
 
-// 生成Pod名称（基于命名空间特征）
+// Generate a Pod name (based on namespace characteristics)
 //
 //nolint:gosec
 func genPodName(ns string) string {
@@ -279,7 +279,7 @@ func genPodName(ns string) string {
 	)
 }
 
-// 生成容器列表（带sidecar模式）
+// Generate a container list (with sidecar pattern)
 //
 //nolint:gosec
 func genContainers(ns string) string {
@@ -295,16 +295,16 @@ func genContainers(ns string) string {
 
 	var containers []string
 
-	// 主容器
+	// Main container
 	main := baseContainers[CryptoRandInt(len(baseContainers))]
 	containers = append(containers, main)
 
-	// 30%的Pod带sidecar
+	// 30% of Pods have a sidecar
 	if CryptoRandInt(100) < 30 {
 		containers = append(containers, sidecars[CryptoRandInt(len(sidecars))])
 	}
 
-	// 系统命名空间特殊处理
+	// Special handling for system namespaces
 	if strings.Contains(ns, "kube-system") {
 		return strings.Join([]string{"kube-proxy", "metrics-server"}, ",")
 	}
@@ -312,9 +312,9 @@ func genContainers(ns string) string {
 	return strings.Join(containers, ",")
 }
 
-// 辅助函数：随机选择
+// Helper function: random selection
 //
-//nolint:gosec // 测试数据生成无需密码学安全随机
+//nolint:gosec // Test data generation does not require cryptographically secure randomness
 func choice(options []string) string {
 	if len(options) == 0 {
 		return "none"
@@ -322,7 +322,7 @@ func choice(options []string) string {
 	return options[CryptoRandInt(len(options))]
 }
 
-// 生成随机字符串
+// Generate a random string
 //
 //nolint:gosec
 func randomString(n int) string {
@@ -342,6 +342,6 @@ func CryptoRandInt(max int) int {
 		return 0
 	}
 
-	// 调整到目标范围并返回
+	// Adjust to the target range and return
 	return int(randomNum.Int64())
 }

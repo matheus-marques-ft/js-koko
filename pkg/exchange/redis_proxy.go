@@ -14,7 +14,7 @@ func proxyRoom(room *Room, ch *redisChannel, userInputCh chan *RoomMessage) {
 	defer tick.Stop()
 	defer func() {
 		ch.manager.removeProxyRoomChan <- room
-		err := ch.Close() // 关闭连接
+		err := ch.Close() // close the connection
 		if err != nil {
 			logger.Errorf("Redis channel close err: %s", err)
 		}
@@ -57,7 +57,7 @@ func proxyRoom(room *Room, ch *redisChannel, userInputCh chan *RoomMessage) {
 	}
 }
 
-// 接受其他 koko 的数据 给 Room
+// Receive data from other koko instances and pass it to the Room
 func proxyUserCon(room *Room, ch *redisChannel) {
 	tick := time.NewTicker(time.Minute)
 	defer tick.Stop()

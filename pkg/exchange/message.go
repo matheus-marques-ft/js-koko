@@ -6,7 +6,7 @@ type RoomMessage struct {
 	Event string `json:"event"`
 	Body  []byte `json:"data"`
 
-	Meta MetaMessage `json:"meta"` // receive的信息必须携带Meta
+	Meta MetaMessage `json:"meta"` // received messages must include Meta
 }
 
 func (m *RoomMessage) Marshal() []byte {

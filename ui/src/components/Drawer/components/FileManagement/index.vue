@@ -61,7 +61,7 @@ watch(
 );
 
 /**
- * @description 生成表头
+ * @description Generate table header
  */
 const createColumns = (): DataTableColumns<RowData> => {
   return [

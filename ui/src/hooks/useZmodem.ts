@@ -77,12 +77,13 @@ export const useZmodem = () => {
     if (drainTimer) {
       clearTimeout(drainTimer);
     }
-    // 后端先广播会话结束，再把 CAN 转给远端；留出短暂窗口吞掉残余协议字节。
+    // The backend broadcasts session end before forwarding CAN to the remote peer;
+    // leave a brief window to swallow any residual protocol bytes.
     drainTimer = setTimeout(stopDraining, DRAIN_END_GRACE);
   };
 
   /**
-   * 只释放浏览器端状态，不向对端发送协议消息。
+   * Only releases browser-side state; does not send any protocol message to the peer.
    */
   const cleanupSession = (session?: ZmodemSession) => {
     let cleaned = false;
@@ -130,7 +131,8 @@ export const useZmodem = () => {
 
   const handleSessionEnd = (session: ZmodemSession, terminal: Terminal) => {
     terminal.write('\r\n');
-    // close() 会先同步触发 session_end，再 resolve Promise；延后一轮以免把正常完成误判为取消。
+    // close() synchronously fires session_end before resolving the promise; defer by one tick
+    // to avoid mistaking normal completion for a cancellation.
     setTimeout(() => {
       if (activeTransferSession.value === session) {
         activeTransferController.value?.abort();
@@ -171,7 +173,8 @@ export const useZmodem = () => {
     }
 
     if (socket.bufferedAmount <= SOCKET_BUFFER_HIGH_WATERMARK) {
-      // 每个文件块都让出一次事件循环，避免连续编码大文件阻塞浏览器主线程。
+      // Yield the event loop once per file chunk to avoid blocking the browser main thread
+      // when encoding large files back to back.
       await abortableDelay(0, signal);
       return;
     }
@@ -251,7 +254,7 @@ export const useZmodem = () => {
   };
 
   /**
-   * 分块读取文件，并根据 WebSocket 发送队列做背压。
+   * Reads the file in chunks and applies backpressure based on the WebSocket send queue.
    */
   const handleUpload = async (session: ZmodemSession, terminal: Terminal, socket: WebSocket, signal: AbortSignal) => {
     const file = fileInfo.value;
@@ -283,7 +286,8 @@ export const useZmodem = () => {
       throw new Error(`Invalid ZMODEM resume offset: ${offset}`);
     }
     if (offset > 0) {
-      // nora-zmodemjs 暴露了 Transfer 偏移，但没有同步其发送 Session 的内部偏移。
+      // nora-zmodemjs exposes the Transfer offset but does not sync it with the send Session's
+      // internal offset.
       (session as ZmodemSendSession)._file_offset = offset;
       writeUploadProgress(file, offset, terminal);
     }
@@ -318,7 +322,8 @@ export const useZmodem = () => {
           await waitForPeer(peerResponse, signal);
         }
         else {
-          // 当前依赖分支会在每次 send() 后清空该指针，分块续传前必须重新关联。
+          // The current dependency branch clears this pointer after every send(), so it must be
+          // reattached before resuming the chunked transfer.
           (session as ZmodemSendSession)._current_transfer = transfer;
           transfer.send(payload);
           offset = nextOffset;

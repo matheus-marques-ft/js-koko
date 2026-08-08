@@ -19,34 +19,34 @@ export interface IParamsState {
 }
 
 export interface ITerminalConfig {
-  // 主题
+  // Theme
   themeName: string;
 
-  // 快速粘贴
+  // Quick paste
   quickPaste: string;
 
   // Ctrl
   ctrlCAsCtrlZ: string;
 
-  // 退格键
+  // Backspace key
   backspaceAsCtrlH: string;
 
-  // 字体大小
+  // Font size
   fontSize: number;
 
-  // 行高
+  // Line height
   lineHeight: number;
 
-  // 字体
+  // Font family
   fontFamily: string;
 
-  // 是否开启 Zmodem
+  // Whether Zmodem is enabled
   enableZmodem: boolean;
 
-  // 当前 Zmodem 状态
+  // Current Zmodem status
   zmodemStatus: boolean;
 
-  // 当前页签
+  // Current tab
   currentTab: string;
 
   termSelectionText: string;

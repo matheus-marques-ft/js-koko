@@ -125,14 +125,14 @@ func GetAllFiles(dirPth string) (files []string, err error) {
 	}
 
 	PthSep := string(os.PathSeparator)
-	//suffix = strings.ToUpper(suffix) //忽略后缀匹配的大小写
+	//suffix = strings.ToUpper(suffix) //ignore case when matching the suffix
 
 	for _, fi := range dir {
-		if fi.IsDir() { // 目录, 递归遍历
+		if fi.IsDir() { // directory, recurse into it
 			dirs = append(dirs, dirPth+PthSep+fi.Name())
 			GetAllFiles(dirPth + PthSep + fi.Name())
 		} else {
-			// 过滤指定格式
+			// filter by the given format
 			ok := strings.HasSuffix(fi.Name(), ".go")
 			if ok {
 				files = append(files, dirPth+PthSep+fi.Name())
@@ -140,7 +140,7 @@ func GetAllFiles(dirPth string) (files []string, err error) {
 		}
 	}
 
-	// 读取子目录下文件
+	// read files under subdirectories
 	for _, table := range dirs {
 		temp, _ := GetAllFiles(table)
 		for _, temp1 := range temp {

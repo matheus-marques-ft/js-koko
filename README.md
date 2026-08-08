@@ -21,7 +21,7 @@ Koko is implemented using Golang and Vue, and the name comes from a Dota hero [K
 1. Clone the project
 
 ```shell
-git clone https://github.com/jumpserver/koko.git
+git clone https://github.com/matheus-marques-ft/js-koko.git
 ```
 
 2. Build the application
@@ -46,7 +46,7 @@ koko-[branch name]-[commit]-linux-amd64.tar.gz
 tar xzvf koko-[branch name]-[commit]-linux-amd64.tar.gz
 ```
 
-3. Create the file `config.yml`, refer to [config_example.yml](https://github.com/jumpserver/koko/blob/master/config_example.yml)
+3. Create the file `config.yml`, refer to [config_example.yml](https://github.com/matheus-marques-ft/js-koko/blob/main/config_example.yml)
 ```shell
 touch config.yml
 ```
@@ -91,3 +91,26 @@ make docker
 
 ## Acknowledgments
 This project depends on [usql](https://github.com/xo/usql) for database connections. We appreciate their support.
+
+## Repository Layout
+
+This repo builds the `koko` image consumed by [js-installer](https://github.com/matheus-marques-ft/js-installer)'s `compose/koko.yml`. Koko is JumpServer's character-protocol connector — it's what a user's SSH/Telnet/K8s/database client or the browser-based Web Terminal (served by [js-luna](https://github.com/matheus-marques-ft/js-luna)) actually connects through to reach an asset.
+
+- **`pkg/sshd/`** — the native SSH server (`sshd`): dispatches an inbound SSH connection to the right backend protocol handler.
+- **`pkg/httpd/`** — the HTTP/WebSocket server behind the Web Terminal, Web SFTP volume, and the AI chat panel.
+- **`pkg/handler/`** — interactive session/menu logic shared by both `sshd` and `httpd` entrypoints (asset selection, banners, login confirmation, direct-connect).
+- **`pkg/proxy/`** — the actual protocol proxy: `server.go`'s `getServerConn()` dispatches by protocol (SSH, K8s, database, RDP-gateway) to the matching connection type in `pkg/srvconn/`, then `switch.go` pipes data between client and backend while `recorder.go`/`command_check.go` handle session recording and command-filter ACL enforcement.
+- **`pkg/srvconn/`** — per-protocol backend connections: `conn_ssh.go`, `conn_k8s*.go` (spawns a local `kubectl`/`unshare` PTY), `conn_telnet.go`, `conn_mongodb.go`, `conn_redis.go`, `conn_usql.go` (generic SQL via the vendored `usql`), SFTP variants.
+- **`pkg/exchange/`** — pub/sub session-sharing backbone (in-memory or Redis-backed), used for session monitoring/joining.
+- **`ui/`** — the Vue 3 + TypeScript frontend for the Web Terminal/Web SFTP/Kubernetes tree UI, built separately and embedded into the Go binary via `assets.go`.
+- **`locale/`** — gettext `.po`/`.mo` catalogs (`zh`, `ja`, `zh_Hant`) for CLI/server-side i18n; `ui/src/locales/modules/*.json` are the separate frontend i18n catalogs.
+- **`static/plugins/elfinder/`** — vendored third-party file-manager library (elfinder.org), not part of this fork's own code.
+- **`Dockerfile-base`** / **`Dockerfile`** — two-stage build: `Dockerfile-base` compiles Go dependencies and vendors external CLI tools (`k8s-bundle`, `healthcheck`, `usql`) into the `koko-base` image; `Dockerfile` builds the actual binary + embedded UI on top of that base.
+
+### CI → GHCR mapping
+
+| Workflow | Publishes |
+|---|---|
+| `build-base-image.yml` | `ghcr.io/matheus-marques-ft/koko-base:<timestamp>` — triggered by changes to `Dockerfile-base`, auto-commits the new tag into `Dockerfile` |
+| `build-ghcr-image.yml` | `ghcr.io/matheus-marques-ft/koko:<tag>` — triggered on `v*` tags or manual dispatch |
+| `release-drafter.yml` | drafts a GitHub Release with build artifacts — triggered on `v*` tags |

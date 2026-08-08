@@ -60,7 +60,7 @@ interface UploadTaskState {
   suppressErrorMessage?: boolean;
 }
 
-// TODO 都是 hook 内部状态
+// TODO all internal hook state
 let initialPath = '';
 const downloadTasks = new Map<string, DownloadTaskState>();
 const uploadTasks = new Map<string, UploadTaskState>();
@@ -98,7 +98,7 @@ function failActiveUploads(message: string) {
 }
 
 /**
- * @description 将 buffer 转为 base64
+ * @description Convert a buffer to base64
  * @param buffer
  */
 function arrayBufferToBase64(buffer: ArrayBuffer): string {
@@ -116,7 +116,7 @@ function arrayBufferToBase64(buffer: ArrayBuffer): string {
 }
 
 /**
- * @description 刷新文件列表
+ * @description Refresh the file list
  * @param socket
  * @param path
  */
@@ -136,7 +136,7 @@ export function refresh(socket: WebSocket, path: string) {
 }
 
 /**
- * @description 处理 type 为 connect 的方法
+ * @description Handle the method for the 'connect' type
  * @param messageData
  * @param id
  * @param socket
@@ -159,18 +159,18 @@ function handleSocketConnectEvent(messageData: FileManageConnectData, id: string
 }
 
 /**
- * @description 设置文件信息 table
+ * @description Set the file info table
  * @param messageData
  */
 function handleSocketSftpData(messageData: FileManageSftpFileItem[]) {
   const fileManageStore = useFileManageStore();
 
-  // 初始化时保存初始路径
+  // Save the initial path on first initialization
   if (initialPath === '') {
     initialPath = fileManageStore.currentPath;
   }
 
-  // 如果当前路径是根目录或者是初始路径，则不添加 .. 文件夹
+  // Don't add the '..' folder if the current path is the root directory or the initial path
   if (fileManageStore.currentPath === '/' || fileManageStore.currentPath === initialPath) {
     messageData = [...messageData];
   }
@@ -192,8 +192,8 @@ function handleSocketSftpData(messageData: FileManageSftpFileItem[]) {
 }
 
 /**
- * @description 心跳检测机制
- * @param socket WebSocket实例
+ * @description Heartbeat detection mechanism
+ * @param socket WebSocket instance
  */
 function heartBeat(socket: WebSocket) {
   let pingInterval: number | null = null;
@@ -225,7 +225,7 @@ function heartBeat(socket: WebSocket) {
 }
 
 /**
- * @description 处理 message
+ * @description Handle the message
  * @param socket
  */
 function initSocketEvent(socket: WebSocket, t: any) {
@@ -415,9 +415,9 @@ function initSocketEvent(socket: WebSocket, t: any) {
         downloadTasks.forEach(task => task.message.destroy());
         downloadTasks.clear();
 
-        // 文件列表置空
+        // Clear the file list
         fileManageStore.setFileList([]);
-        // 文件路径置空
+        // Clear the file path
         fileManageStore.setCurrentPath('');
 
         socket.close();
@@ -435,7 +435,7 @@ function initSocketEvent(socket: WebSocket, t: any) {
 }
 
 /**
- * @description 文件管理中的 Socket 连接
+ * @description Socket connection within file management
  * @param url
  */
 function fileSocketConnection(url: string, t: any) {
@@ -457,7 +457,7 @@ function fileSocketConnection(url: string, t: any) {
 }
 
 /**
- * @description 路径跳转的处理
+ * @description Handle path navigation
  * @param socket
  * @param path
  */
@@ -473,7 +473,7 @@ function handleChangePath(socket: WebSocket, path: string) {
 }
 
 /**
- * @description 创建文件夹
+ * @description Create a folder
  * @param socket
  * @param path
  */
@@ -489,7 +489,7 @@ function handleFileCreate(socket: WebSocket, path: string) {
 }
 
 /**
- * @description 重命名
+ * @description Rename
  * @param socket
  * @param path
  * @param newName
@@ -506,7 +506,7 @@ function handleFileRename(socket: WebSocket, path: string, newName: string) {
 }
 
 /**
- * @description 移除文件
+ * @description Remove a file
  * @param socket
  * @param path
  */
@@ -522,7 +522,7 @@ function handleFileRemove(socket: WebSocket, path: string) {
 }
 
 /**
- * @description 下载文件
+ * @description Download a file
  * @param socket
  * @param path
  * @param is_dir
@@ -552,7 +552,7 @@ function handleFileDownload(socket: WebSocket, path: string, is_dir: boolean, si
 }
 
 /**
- * @description 预处理 chunks
+ * @description Pre-process chunks
  */
 async function generateUploadChunks(
   sliceChunk: Blob,
@@ -641,7 +641,7 @@ function finishUploadWithError(uploadTask: UploadTaskState, onError: () => void,
 }
 
 /**
- * @description 中断上传,停止继续发送切片信息
+ * @description Interrupt the upload, stop sending further chunk data
  */
 function interraptUpload(fileInfo: UploadFileInfo) {
   const uploadTask = Array.from(uploadTasks.values()).find(task => task.fileId === fileInfo.id);
@@ -656,7 +656,7 @@ function interraptUpload(fileInfo: UploadFileInfo) {
 }
 
 /**
- * @description 上传文件
+ * @description Upload a file
  */
 async function handleFileUpload(
   socket: WebSocket,
@@ -685,13 +685,13 @@ async function handleFileUpload(
     uploadTasks.set(requestId, uploadTask);
     let sliceCount = Math.ceil(fileInfo.file?.size / CHUNK_SIZE);
 
-    // 如果切片数量大于最大切片数量，那么调大切片大小
+    // If the chunk count exceeds the max chunk count, increase the chunk size
     if (sliceCount > maxSliceCount) {
       sliceCount = maxSliceCount;
       CHUNK_SIZE = Math.ceil(fileInfo.file?.size / maxSliceCount);
     }
 
-    // 如果切片大小大于最大切片大小，那么依然调整切片数量
+    // If the chunk size still exceeds the max chunk size, adjust the chunk count as well
     if (CHUNK_SIZE > maxChunkSize) {
       CHUNK_SIZE = maxChunkSize;
       sliceCount = Math.ceil(fileInfo.file?.size / CHUNK_SIZE);
@@ -702,7 +702,7 @@ async function handleFileUpload(
     }
 
     try {
-      // 判断是否只有一个切片
+      // Check whether there is only a single chunk
       const isSingleChunk = sliceChunks.length === 1;
 
       for (const sliceChunk of sliceChunks) {
@@ -734,7 +734,7 @@ async function handleFileUpload(
         return;
       }
 
-      // 如果不是单切片，才需要发送merge请求
+      // Only send the merge request if there is more than one chunk
       if (sliceChunks.length > 1) {
         const merged = await mergeUploadChunks(
           socket,
@@ -764,7 +764,7 @@ async function handleFileUpload(
 }
 
 /**
- * @description 用于处理文件管理相关逻辑
+ * @description Used to handle file management related logic
  */
 export function useFileManage(token: string, t: any) {
   const fileConnectionUrl: string = `${BASE_WS_URL}/koko/ws/sftp/?token=${token}`;

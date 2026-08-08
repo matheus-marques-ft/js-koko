@@ -4,7 +4,7 @@ import { useColor } from './hooks/useColor';
 
 const { darken, lighten, alpha, setCurrentMainColor } = useColor();
 
-// 创建主题生成函数
+// Create theme generation function
 export const createThemeOverrides = (
   themeType: 'default' | 'deepBlue' | 'darkGary' = 'default'
 ): GlobalThemeOverrides => {

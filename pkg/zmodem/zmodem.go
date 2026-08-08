@@ -38,7 +38,7 @@ type ZmodemParser struct {
 
 	currentHeader *ZmodemHeader
 
-	abortMark       bool // 不记录中断的文件
+	abortMark       bool // do not record aborted files
 	hasDataTransfer bool
 
 	FireStatusEvent func(event StatusEvent)
@@ -46,7 +46,7 @@ type ZmodemParser struct {
 	AbnormalFinish bool
 }
 
-// rz sz 解析的入口
+// Entry point for rz/sz parsing
 
 func (z *ZmodemParser) Parse(p []byte) {
 	z.Lock()
@@ -88,7 +88,7 @@ func (z *ZmodemParser) consumeInitialHeader(p []byte) {
 				z.initialHeaderBuf = append(z.initialHeaderBuf[:0], candidate...)
 				return
 			}
-			// 丢弃损坏帧的第一个字节，继续寻找下一帧，避免解析器永久卡住。
+			// Discard the first byte of the corrupted frame and keep looking for the next frame, to avoid the parser getting stuck forever.
 			z.initialHeaderBuf = append(z.initialHeaderBuf[:0], candidate[1:]...)
 			continue
 		}
@@ -213,7 +213,7 @@ func (z *ZmodemParser) SessionType() string {
 }
 
 func (z *ZmodemParser) SetAbortMark() {
-	// 不记录中断的文件
+	// Do not record aborted files
 	z.abortMark = true
 }
 
@@ -234,7 +234,7 @@ func (z *ZmodemParser) OnHeader(hd *ZmodemHeader) {
 				status := true
 				if !z.hasDataTransfer && z.currentZFileInfo.size > 0 {
 					/*
-					 如果没有文件传输，且文件大小大于0， 则代表下载失败
+					 If there was no file transfer and the file size is greater than 0, this represents a failed download
 					*/
 					status = false
 				}
@@ -293,7 +293,7 @@ func ParseNonZDLEBinary16(p []byte) *ZmodemHeader {
 	if len(p) < bin16HeaderLen {
 		return nil
 	}
-	// todo 校验 crc-1 crc-2 ?
+	// todo validate crc-1 crc-2 ?
 	return &ZmodemHeader{
 		Type: p[0],
 		ZF0:  p[1],

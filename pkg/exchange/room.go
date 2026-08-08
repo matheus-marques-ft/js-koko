@@ -162,7 +162,7 @@ func (r *Room) Receive(msg *RoomMessage) {
 }
 
 func (r *Room) broadcastMessage(conns userConnections, msg *RoomMessage) {
-	// 减少启动goroutine的数量
+	// Reduce the number of goroutines started
 	if len(conns) == 0 {
 		return
 	}
@@ -171,7 +171,7 @@ func (r *Room) broadcastMessage(conns userConnections, msg *RoomMessage) {
 		return
 	}
 
-	// 启动 goroutine 发送消息
+	// Start goroutines to send the message
 	sort.Sort(conns)
 	var wg sync.WaitGroup
 	for i := range conns {

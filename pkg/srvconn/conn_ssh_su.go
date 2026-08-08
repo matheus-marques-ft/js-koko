@@ -52,14 +52,14 @@ const (
 
 const (
 	/*
-	   huawei、h3c 的终端提示符
+	   huawei, h3c terminal prompt
 	*/
 	huaweiH3CPs1Mark = "^<.*>"
 )
 
 const (
 	/*
-		Linux 相关
+		Linux related
 	*/
 
 	LinuxSuCommand = "su - %s; exit"
@@ -71,25 +71,25 @@ const (
 	LinuxOnlySudoCommand = "sudo su %s; exit"
 
 	/*
-		Cisco 相关
+		Cisco related
 	*/
 
 	SuCommandEnable = "enable"
 
 	/*
-		huawei 相关
+		huawei related
 	*/
 
 	SuCommandSuper = "super 15"
 
 	/*
-		h3c super 相关
+		h3c super related
 	*/
 
 	SuCommandSuperH3C = "super level-15"
 
 	/*
-		匹配行内的密码提示片段，兼容 sudo、PAM 和终端控制字符添加的前后缀。
+		Matches the password prompt fragment within a line, compatible with sudo, PAM, and prefixes/suffixes added by terminal control characters.
 	*/
 
 	passwordMatchPattern = `(?i)(?:\bpassword\b(?:\s+for\s+[^:：\r\n]+)?|[^\s:：\r\n]+['’]s\s+\bpassword\b|(?:[^:：\r\n]*的\s*)?密码)\s*[:：]`
@@ -97,7 +97,7 @@ const (
 	usernameMatchPattern = "(?i)username:?\\s*$|name:?\\s*$|用户名:?\\s*$"
 )
 
-// 收集完善切换用户失败的提示信息
+// Collected and refined prompt messages for switch-user failures
 
 var switchPasswordFailures = []string{
 	"password has not been set",

@@ -1,70 +1,70 @@
-# 项目名称, 会用来向Jumpserver注册, 识别而已, 不能重复
+# Project name, used to register with Jumpserver, purely for identification, must not be duplicated
 # NAME: {{ Hostname }}
 
-# Jumpserver项目的url, api请求注册会使用
+# Jumpserver project URL, used for the API request that performs registration
 CORE_HOST: http://127.0.0.1:8080
 
-# Bootstrap Token, 预共享秘钥, 用来注册coco使用的service account和terminal
-# 请和jumpserver 配置文件中保持一致，注册完成后可以删除
+# Bootstrap Token, pre-shared secret key, used to register the service account and terminal used by coco
+# Must match the jumpserver configuration file; can be removed once registration is complete
 BOOTSTRAP_TOKEN: <PleasgeChangeSameWithJumpserver>
 
-# 启动时绑定的ip, 默认 0.0.0.0
+# IP bound at startup, default 0.0.0.0
 # BIND_HOST: 0.0.0.0
 
-# 监听的SSH端口号, 默认2222
+# SSH port to listen on, default 2222
 # SSHD_PORT: 2222
 
-# 监听的HTTP/WS端口号，默认5000
+# HTTP/WS port to listen on, default 5000
 # HTTPD_PORT: 5000
 
-# 设置日志级别 [DEBUG, INFO, WARN, ERROR, FATAL, CRITICAL]
+# Set the log level [DEBUG, INFO, WARN, ERROR, FATAL, CRITICAL]
 # LOG_LEVEL: INFO
 
-# SSH连接超时时间 (default 15 seconds)
+# SSH connection timeout (default 15 seconds)
 # SSH_TIMEOUT: 15
 
-# Api Http请求的超时时间 (default 30 seconds)
+# Api Http request timeout (default 30 seconds)
 # HTTP_REQUEST_TIMEOUT: 30
 
-# 语言 [en,zh]
+# Language [en,zh]
 # LANGUAGE_CODE: zh
 
-# SFTP是否显示隐藏文件
+# Whether SFTP shows hidden files
 # SFTP_SHOW_HIDDEN_FILE: false
 
-# 是否复用和用户后端资产已建立的连接(用户不会复用其他用户的连接)
+# Whether to reuse a connection the user already has established with a backend asset (users won't reuse other users' connections)
 # REUSE_CONNECTION: true
 
-# 资产加载策略, 可根据资产规模自行调整. 默认异步加载资产, 异步搜索分页; 如果为all, 则资产全部加载, 本地搜索分页.
+# Asset loading strategy, adjust according to asset scale. Default loads assets asynchronously with async search pagination; if set to "all", all assets are loaded upfront with local search pagination.
 # ASSET_LOAD_POLICY:
 
-# zip压缩的最大额度 (单位: M)
+# Maximum size for zip compression (unit: M)
 # ZIP_MAX_SIZE: 1024M
 
-# zip压缩存放的临时目录 /tmp
+# Temporary directory used for zip compression /tmp
 # ZIP_TMP_PATH: /tmp
 
-# 向 SSH Client 连接发送心跳的时间间隔 (单位: 秒)，默认为30, 0则表示不发送
+# Heartbeat interval sent to the SSH Client connection (unit: seconds), default 30, 0 means don't send
 # CLIENT_ALIVE_INTERVAL: 30
 
-# 向资产发送心跳包的重试次数，默认为3
+# Number of heartbeat-packet retries sent to the asset, default 3
 # RETRY_ALIVE_COUNT_MAX: 3
 
-# 会话共享使用的类型 [local, redis], 默认local
+# Session-sharing storage type [local, redis], default local
 # SHARE_ROOM_TYPE: local
 
-# Redis配置
+# Redis configuration
 # REDIS_HOST: 127.0.0.1
 # REDIS_PORT: 6379
 # REDIS_PASSWORD:
 # REDIS_CLUSTERS:
 # REDIS_DB_ROOM:
 
-# 是否开启本地转发 (目前仅对 vscode remote ssh 有效果)
+# Whether to enable local port forwarding (currently only affects vscode remote ssh)
 # ENABLE_LOCAL_PORT_FORWARD: false
 
-# 是否开启 针对 vscode 的 remote-ssh 远程开发支持 (前置条件: 必须开启 ENABLE_LOCAL_PORT_FORWARD )
+# Whether to enable remote development support for vscode's remote-ssh (prerequisite: ENABLE_LOCAL_PORT_FORWARD must be enabled)
 # ENABLE_VSCODE_SUPPORT: false
 
-# KoKo 是否以 privileged 权限运行。为 false 时，Kubernetes 集群连接会提示部署权限不足
+# Whether KoKo runs with privileged permissions. When false, Kubernetes cluster connections will report insufficient deployment permissions
 # KOKO_PRIVILEGED: true

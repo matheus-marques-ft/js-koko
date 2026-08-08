@@ -30,7 +30,7 @@ func (es ESCommandStorage) BulkSave(commands []*model.Command) error {
 	if es.IsEs8() {
 		return es.BulkSaveEs8(commands)
 	}
-	// 探测失败时也先试 Es8，避免 ES9 误走带 type 的旧接口
+	// Even if detection fails, try Es8 first, to avoid ES9 mistakenly going through the old interface with type
 	if err := es.BulkSaveEs8(commands); err == nil {
 		return nil
 	}

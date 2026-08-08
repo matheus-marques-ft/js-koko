@@ -162,7 +162,7 @@ func newRedisManager(cfg Config) (*redisRoomManager, error) {
 			return nil, err
 		}
 		connFunc = func(network, addr string) (radix.Conn, error) {
-			// 选择一个master
+			// Select a master
 			masterAddr, _ := sentinelClient.Addrs()
 			return radix.Dial(cfg.Network, masterAddr, dialOptions...)
 		}
@@ -257,7 +257,7 @@ func (m *redisRoomManager) checkRoomExist(roomId string) bool {
 	return countInt == 1
 }
 
-// 全局 加入room
+// Globally join a room
 func (m *redisRoomManager) storeRoomId(roomId string) {
 	err := m.pool.Do(radix.Cmd(nil, "SADD", globalRoomsKey, roomId))
 	if err != nil {
@@ -267,7 +267,7 @@ func (m *redisRoomManager) storeRoomId(roomId string) {
 	logger.Debugf("Redis Cache store room %s success", roomId)
 }
 
-// 全局 删除room
+// Globally remove a room
 func (m *redisRoomManager) removeRoomId(roomId string) {
 	err := m.pool.Do(radix.Cmd(nil, "SREM", globalRoomsKey, roomId))
 	if err != nil {
@@ -275,7 +275,7 @@ func (m *redisRoomManager) removeRoomId(roomId string) {
 	} else {
 		logger.Debugf("Redis cache remove room %s success", roomId)
 	}
-	// 发布退出事件
+	// Publish the exit event
 	req := m.createRoomEventRequest(roomId, ExitEvent)
 	_, err = m.sendRequest(&req)
 	if err != nil {
@@ -294,7 +294,7 @@ func (m *redisRoomManager) run() {
 
 	requestsMap := make(map[string]chan *subscribeResponse)
 
-	// 本地 Room 增加 redisCon，key 是 room id
+	// Add redisCon to the local Room, keyed by room id
 	redisUserCons := make(map[string]*redisChannel)
 
 	for {
@@ -304,7 +304,7 @@ func (m *redisRoomManager) run() {
 			m.responseChan <- responseChan
 			switch req.Event {
 			case JoinEvent:
-				//	校验本地 是否已经存在
+				//	Check whether it already exists locally
 				if room := m.remoteRoomCache.Get(req.RoomId); room != nil {
 					logger.Debugf("Redis cache already create room %s", req.RoomId)
 					responseChan <- &subscribeResponse{
@@ -314,7 +314,7 @@ func (m *redisRoomManager) run() {
 					}
 					continue
 				}
-				// 本地不存在则发送请求信号
+				// If it doesn't exist locally, send the request signal
 				if err := m.publishRequest(req); err != nil {
 					logger.Debugf("Redis cache send request join room %s err: %s", req.RoomId, err)
 					responseChan <- &subscribeResponse{
@@ -324,7 +324,7 @@ func (m *redisRoomManager) run() {
 					}
 					continue
 				}
-				requestsMap[req.ReqId] = responseChan //不阻塞 等待返回结果
+				requestsMap[req.ReqId] = responseChan // non-blocking, wait for the result to come back
 			case ExitEvent:
 				if err := m.publishRequest(req); err != nil {
 					responseChan <- &subscribeResponse{
@@ -379,7 +379,7 @@ func (m *redisRoomManager) run() {
 						continue
 					}
 					logger.Infof("Redis cache request %s receive result", req.ReqId)
-					// 请求结束，移除缓存, 返回请求的结果
+					// Request finished, remove it from the cache, and return the request's result
 					delete(requestsMap, req.ReqId)
 
 					var res subscribeResponse
@@ -419,7 +419,7 @@ func (m *redisRoomManager) run() {
 					}
 					go proxyRoom(room, s, userInputChan)
 					res.room = room
-					responseChan <- &res // 容量为1， 不阻塞
+					responseChan <- &res // capacity of 1, non-blocking
 					logger.Infof("Redis cache request %s finished", req.ReqId)
 				default:
 					logger.Infof("Result channel receive unhandled event %s", req.Event)
@@ -429,33 +429,33 @@ func (m *redisRoomManager) run() {
 				switch req.Event {
 				case JoinEvent:
 					/*
-						1. 检查是否是自己创建的req: 是则忽略
-						2. 检查是否已经创建过redisUserCon: 是则发送JoinSuccessEvent
-						3. 检查是否是本KOKO创建的Session会话: 是则创建redisUserCon，并发送JoinSuccessEvent
+						1. Check whether this is a req created by ourselves: if so, ignore it
+						2. Check whether a redisUserCon has already been created: if so, send JoinSuccessEvent
+						3. Check whether this Session was created by this KOKO instance: if so, create a redisUserCon and send JoinSuccessEvent
 					*/
 
 					if _, ok := requestsMap[req.ReqId]; ok {
 						logger.Debugf("Redis cache ignore self request %s", req.ReqId)
 						continue
 					}
-					// 创建result channel的req
+					// Create the req for the result channel
 					successReq := m.createRoomResultRequest(req.ReqId,
 						req.RoomId, JoinSuccessEvent)
 
-					// 本地是否已经创建过 redisUserCons
+					// Whether a redisUserCons has already been created locally
 					if srv, ok := redisUserCons[req.RoomId]; ok {
 						logger.Infof("Redis cache already create redis con for room %s", req.RoomId)
 						if err := m.publishRequest(&successReq); err != nil {
 							logger.Errorf("Redis cache reply request %s join event err %s", req.ReqId, err)
 						} else {
 							logger.Infof("Redis cache reply request %s join event", req.ReqId)
-							//  统计一下 req的 count
+							//  Tally up the req's count
 							srv.addSubscribeCount(1)
 						}
 						continue
 					}
 
-					// 如果是当前节点 KoKo 创建的session
+					// If the session was created by the current KoKo node
 					if r := m.localRoomCache.Get(req.RoomId); r != nil {
 						redisCon, err := m.connFunc("", "")
 						if err != nil {
@@ -493,7 +493,7 @@ func (m *redisRoomManager) run() {
 						continue
 					}
 					logger.Infof("The current KoKo node has no session room %s", req.RoomId)
-					// 非本节点 koko 创建的session
+					// The session was not created by this node's koko
 				case LeaveEvent:
 					if srv, ok := redisUserCons[req.RoomId]; ok {
 						srv.addSubscribeCount(-1)

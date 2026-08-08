@@ -248,7 +248,7 @@ const (
 	amazonawsSuffix   = ".amazonaws.com"
 )
 
-// parseBoolValue 解析配置值为布尔类型，支持布尔值和字符串类型
+// parseBoolValue parses a config value into a boolean, supporting both boolean and string types
 func parseBoolValue(value any) bool {
 	switch v := value.(type) {
 	case bool:

@@ -30,7 +30,7 @@ const (
 	k8sInitFilename = "init-kubectl.sh"
 )
 
-// 类似于 `kubectl --insecure-skip-tls-verify=%s --token=%s --server=%s auth can-i get pods`
+// Similar to `kubectl --insecure-skip-tls-verify=%s --token=%s --server=%s auth can-i get pods`
 
 func IsValidK8sUserToken(k8sCfg *rest.Config) bool {
 	client, err := kubernetes.NewForConfig(k8sCfg)
@@ -114,8 +114,8 @@ func (k *K8sCon) Close() error {
 
 type k8sOptions struct {
 	ClusterServer string // https://172.16.10.51:8443
-	Username      string // user 系统用户名
-	Token         string // 授权token
+	Username      string // user's system username
+	Token         string // authorization token
 	IsSkipTls     bool
 	ExtraEnv      map[string]string
 	DEBUG         bool

@@ -240,7 +240,7 @@ func (u *UserVolume) GetFile(path string) (fileData elfinder.FileData, err error
 		logger.Errorf("Record file err: %s", err1)
 	}
 	_, _ = sf.Seek(0, io.SeekStart)
-	// 屏蔽 sftp*File 的 WriteTo 方法，防止调用 sftp stat 命令
+	// block the WriteTo method of sftp*File to prevent invoking the sftp stat command
 	fileData = elfinder.FileData{Reader: sf, Size: fileInfo.Size()}
 	return fileData, nil
 }

@@ -240,7 +240,7 @@ func MatchLoginPrefix(prefix string, dbType string, lcmd *localcommand.LocalComm
 }
 
 func DoLogin(opt *sqlOption, lcmd *localcommand.LocalCommand, dbType string) (*localcommand.LocalCommand, error) {
-	//输入密码, 登录数据库
+	// Enter the password to log in to the database
 	time.Sleep(time.Millisecond * 100)
 	_, err := lcmd.Write([]byte(opt.Password + "\r\n"))
 	if err != nil {
@@ -248,7 +248,7 @@ func DoLogin(opt *sqlOption, lcmd *localcommand.LocalCommand, dbType string) (*l
 		logger.Errorf("%s local pty write err: %s", dbType, err)
 		return lcmd, fmt.Errorf("%s conn err: %s", dbType, err)
 	}
-	//清除掉输入密码后，界面上显示的星号
+	// Clear the asterisks displayed on screen after the password is entered
 	time.Sleep(time.Millisecond * 100)
 	clearPassword := make([]byte, len(opt.Password)+2)
 	_, _ = lcmd.Read(clearPassword)

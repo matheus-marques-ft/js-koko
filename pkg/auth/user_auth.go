@@ -133,7 +133,7 @@ func (u *UserAuthClient) CheckMFAAuth(ctx ssh.Context, challenger gossh.Keyboard
 		return false
 
 	case 1:
-		// 仅有一个 option, 直接跳过选择界面
+		// Only one option, skip the selection screen directly
 		selectedMFAType = opts[0]
 	default:
 		question := CreateSelectOptionsQuestion(opts)

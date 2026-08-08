@@ -26,11 +26,11 @@ func GetDecryptedToken() (token string, err error) {
 
 func WrappedExec(commandString string, secretToHide string) {
 	gracefulStop := make(chan os.Signal, 1)
-	// Ctrl + C 中断操作特殊处理，防止命令无法终止
+	// Special handling for Ctrl+C interruption to prevent the command from failing to terminate
 	signal.Notify(gracefulStop, os.Interrupt)
 	go func() {
 		<-gracefulStop
-		// 增加换行符
+		// Add a newline
 		fmt.Println("")
 		os.Exit(1)
 	}()

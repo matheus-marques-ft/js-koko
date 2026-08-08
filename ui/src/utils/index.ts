@@ -11,7 +11,7 @@ import { AsciiBackspace, AsciiCtrlC, AsciiCtrlZ, AsciiDel } from '@/utils/config
 const { message } = createDiscreteApi(['message']);
 
 /**
- * @description 获取分钟标签
+ * @description Get the minute label
  * @param item
  * @param t
  */
@@ -26,7 +26,7 @@ export function getMinuteLabel(item: number, t: TranslateFunction): string {
 }
 
 /**
- * @description 将缓冲区写入终端
+ * @description Write the buffer into the terminal
  * @param enableZmodem
  * @param zmodemStatus
  * @param terminal
@@ -38,14 +38,15 @@ export function writeBufferToTerminal(
   terminal: Terminal | null,
   data: any
 ) {
-  if (!enableZmodem && zmodemStatus) return message.error('未开启 Zmodem 且当前在 Zmodem 状态, 不允许显示');
+  if (!enableZmodem && zmodemStatus) return message.error('Zmodem is not enabled and is currently in Zmodem state; display is not allowed');
   if (!terminal) return;
   terminal.write(new Uint8Array(data));
 }
 
 export function preprocessInput(data: string, config: Partial<ILunaConfig>) {
-  // 如果配置项 backspaceAsCtrlH 启用（值为 "1"），并且输入数据包含删除键的 ASCII 码 (AsciiDel，即 127)，
-  // 它会将其替换为退格键的 ASCII 码 (AsciiBackspace，即 8)
+  // If the backspaceAsCtrlH config option is enabled (value "1") and the input data contains the
+  // Delete key's ASCII code (AsciiDel, i.e. 127), replace it with the Backspace key's ASCII code
+  // (AsciiBackspace, i.e. 8)
   if (config.backspaceAsCtrlH === '1') {
     if (data.charCodeAt(0) === AsciiDel) {
       data = String.fromCharCode(AsciiBackspace);
@@ -58,7 +59,7 @@ export function preprocessInput(data: string, config: Partial<ILunaConfig>) {
     }
   }
 
-  // 使用字符串替换方法避免在正则表达式中使用控制字符
+  // Use string replacement methods to avoid using control characters in regular expressions
   // const escSeq200 = '\u001B[200~';
   // const escSeq201 = '\u001B[201~';
 
@@ -70,7 +71,7 @@ export function preprocessInput(data: string, config: Partial<ILunaConfig>) {
 }
 
 /**
- * @description 处理文件名称
+ * @description Process the file name
  * @param row
  */
 export function getFileName(row: RowData) {
@@ -84,12 +85,12 @@ export function getFileName(row: RowData) {
 }
 
 /**
- * @description 使用 postMessage 发送事件到父窗口。
+ * @description Send an event to the parent window using postMessage.
  *
- * @param {string} name - 事件的名称。
- * @param {any} data - 要随事件发送的数据。
- * @param {string | null} [lunaId] - Luna 实例的 ID。
- * @param {string | null} [origin] - 消息的来源。
+ * @param {string} name - The name of the event.
+ * @param {any} data - The data to send with the event.
+ * @param {string | null} [lunaId] - The ID of the Luna instance.
+ * @param {string | null} [origin] - The origin of the message.
  */
 export function sendEventToLuna(name: string, data: any, lunaId: string | null = '', origin: string | null = '') {
   if (lunaId !== null && origin !== null) {
@@ -102,12 +103,12 @@ export function sendEventToLuna(name: string, data: any, lunaId: string | null =
 }
 
 /**
- * @description 格式化消息为 JSON 字符串。
+ * @description Format the message as a JSON string.
  *
- * @param id - 消息的 ID。
- * @param type - 消息的类型。
- * @param data - 消息的数据。
- * @returns 格式化的 JSON 字符串。
+ * @param id - The message ID.
+ * @param type - The message type.
+ * @param data - The message data.
+ * @returns The formatted JSON string.
  */
 export function formatMessage(id: string, type: string, data: any) {
   return JSON.stringify({

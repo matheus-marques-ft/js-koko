@@ -169,7 +169,7 @@ func checkRedisAccount(args *sqlOption) error {
 
 	if args.UseSSL {
 		tlsConfig := tls.Config{}
-		// 连接使用的是内部地址或者localhost时，跳过证书验证
+		// Skip certificate verification when connecting to an internal address or localhost
 		if args.Host == "127.0.0.1" || args.Host == "localhost" {
 			tlsConfig.InsecureSkipVerify = true
 		}

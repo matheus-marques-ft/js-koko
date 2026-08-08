@@ -62,7 +62,7 @@ type Config struct {
 
 	HiddenFields []string `mapstructure:"HIDDEN_FIELDS"`
 
-	// 仅控制是否缓存 sftp 的 token 连接
+	// Only controls whether the sftp token connection is cached
 	ConnectionTokenReusable bool `mapstructure:"CONNECTION_TOKEN_REUSABLE"`
 
 	SshMaxSessions int `mapstructure:"SSH_MAX_SESSIONS"`
@@ -202,7 +202,7 @@ func getPwdDirPath() string {
 }
 
 func loadConfigFromEnv(conf *Config) {
-	viper.AutomaticEnv() // 全局配置，用于其他 pkg 包可以用 viper 获取环境变量的值
+	viper.AutomaticEnv() // Global config, so other pkg packages can use viper to read environment variable values
 	envViper := viper.New()
 	for _, item := range os.Environ() {
 		envItem := strings.SplitN(item, "=", 2)
@@ -241,7 +241,7 @@ const (
 )
 
 /*
-SERVER_HOSTNAME: 环境变量名，可用于自定义默认注册名称的前缀
+SERVER_HOSTNAME: environment variable name, can be used to customize the prefix of the default registered name
 default name rule:
 [Koko]-{SERVER_HOSTNAME}-{HOSTNAME}-RandomStr
  or

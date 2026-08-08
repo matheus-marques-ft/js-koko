@@ -88,13 +88,13 @@ const findNodeById = (nameRef: string) => {
     if (value.k8s_id === nameRef) {
       treeStore.setCurrentNode(value);
 
-      // 恢复当前节点的 ctrlCAsCtrlZ 配置
+      // Restore the ctrlCAsCtrlZ config for the current node
       if (value.ctrlCAsCtrlZMap && value.ctrlCAsCtrlZMap.has(value.k8s_id)) {
         const ctrlCAsCtrl: string = value.ctrlCAsCtrlZMap.get(value.k8s_id);
         terminalStore.setTerminalConfig('ctrlCAsCtrlZ', ctrlCAsCtrl);
       }
 
-      // 恢复当前节点的 backspaceAsCtrlH 配置
+      // Restore the backspaceAsCtrlH config for the current node
       if (value.backspaceAsCtrlHMap && value.backspaceAsCtrlHMap.has(value.k8s_id)) {
         const backspaceAsCtrlH: string = value.backspaceAsCtrlHMap.get(value.k8s_id);
         terminalStore.setTerminalConfig('backspaceAsCtrlH', backspaceAsCtrlH);
@@ -105,7 +105,7 @@ const findNodeById = (nameRef: string) => {
 };
 
 /**
- * @description 处理标签关闭
+ * @description Handle tab close
  *
  * @param name
  */
@@ -131,23 +131,23 @@ function handleClose(name: string) {
 
   const panelLength = panels.value.length;
 
-  // 如果所有 tab 都关闭了，自动关闭抽屉
+  // If all tabs are closed, automatically close the drawer
   if (panelLength === 0) {
     mittBus.emit('close-drawer');
   }
 
-  // 只有当 tab 的数量大于 1 并且为当前所在的 tab 在关闭时才会自动定位到前一位
+  // Only auto-position to the previous tab when there is more than 1 tab and the tab being closed is the current one
   if (panelLength >= 1 && nameRef.value === name) {
     nameRef.value = panels.value[panelLength - 1].name as string;
     findNodeById(nameRef.value);
     terminalStore.setTerminalConfig('currentTab', nameRef.value);
-    // 关闭后自动切换时也要切换焦点
+    // Also switch focus when auto-switching after close
     focusActiveTerminal(nameRef.value);
   }
 }
 
 /**
- * @description 切换标签
+ * @description Switch tab
  *
  * @param value
  */
@@ -158,31 +158,31 @@ function handleChangeTab(value: string) {
 
   terminalStore.setTerminalConfig('currentTab', value);
 
-  // 切换终端焦点
+  // Switch terminal focus
   focusActiveTerminal(value);
 }
 
 /**
- * @description 聚焦当前激活的终端，让其他终端失焦
+ * @description Focus the currently active terminal and blur the others
  */
 function focusActiveTerminal(activeK8sId: string) {
-  // 延迟执行，确保 Tab 切换的 DOM 更新完成
+  // Delay execution to ensure the DOM update from the tab switch has completed
   nextTick(() => {
     setTimeout(() => {
       for (const [_mapKey, node] of treeStore.terminalMap.entries()) {
         const terminal = node?.terminal;
         if (terminal) {
           if (node.k8s_id === activeK8sId) {
-            // 获取终端的 DOM 元素
+            // Get the terminal's DOM element
             const terminalElement = document.getElementById(activeK8sId);
             if (terminalElement) {
-              // 确保元素可见
+              // Ensure the element is visible
               terminalElement.style.display = '';
 
-              // 强制聚焦
+              // Force focus
               terminal.focus();
 
-              // 额外确保 DOM 元素也获得焦点
+              // Additionally ensure the DOM element also receives focus
               const textareaElements = terminalElement.querySelectorAll('textarea');
               if (textareaElements.length > 0) {
                 textareaElements[0].focus();
@@ -198,7 +198,7 @@ function focusActiveTerminal(activeK8sId: string) {
 }
 
 /**
- * @description 每个 tab 标签的右侧快捷功能
+ * @description Shortcut actions on the right side of each tab label
  * @param e
  */
 function handleContextMenu(e: PointerEvent) {
@@ -209,7 +209,7 @@ function handleContextMenu(e: PointerEvent) {
   }
 
   if (target) {
-    // 获取设置的 data 属性
+    // Get the configured data attribute
     const dataName: string = target.getAttribute('data-name') as string;
 
     if (dataName) {
@@ -224,7 +224,7 @@ function handleContextMenu(e: PointerEvent) {
 }
 
 /**
- * @description 重新连接
+ * @description Reconnect
  */
 function handleReconnect(type: string) {
   const operatedNode = treeStore.getTerminalByK8sId(contextIdentification.value);
@@ -241,7 +241,7 @@ function handleReconnect(type: string) {
       );
     }
 
-    // 找到所操作节点的下标，
+    // Find the index of the operated node,
     const index = panels.value.findIndex(panel => panel.name === contextIdentification.value);
 
     panels.value.splice(index, 1);
@@ -262,7 +262,7 @@ function handleReconnect(type: string) {
 }
 
 /**
- * @description 右键菜单的回调
+ * @description Context menu callback
  *
  * @param key
  * @param _option
@@ -270,7 +270,7 @@ function handleReconnect(type: string) {
 function handleContextMenuSelect(key: string, _option: DropdownOption) {
   switch (key) {
     case 'reconnect': {
-      // 对于重新连接来说只有 k8sid 需要变化，并且需要发送 K8S_CLOSE 时间
+      // For reconnecting, only the k8sid needs to change, and a K8S_CLOSE message needs to be sent
       handleReconnect('reconnect');
       break;
     }
@@ -300,7 +300,7 @@ function handleContextMenuSelect(key: string, _option: DropdownOption) {
 }
 
 /**
- * @description 更新 tab 的唯一标识
+ * @description Update the unique identifier of the tab
  *
  * @param key
  */
@@ -316,22 +316,22 @@ function updateTabElements(key: string) {
 }
 
 /**
- * @description 关闭右侧菜单
+ * @description Close the right-side menu
  */
 function handleClickOutside() {
   showContextMenu.value = false;
 }
 
 /**
- * @description tab item 的拖拽处理
+ * @description Drag handling for the tab item
  */
 function initializeDraggable() {
   const tabsContainer = document.querySelector('.n-tabs-wrapper');
 
   if (tabsContainer) {
-    // 对于 useDraggable 如果直接操作 panel 可能会导致被注入一个 undefined 值从而导致报错，因此下面代码全部使用副本来操作
+    // For useDraggable, directly operating on panel may cause an undefined value to be injected, causing an error; so the code below always operates on a copy
     useDraggable<UseDraggableReturn>(
-      // @ts-expect-error 类型错误
+      // @ts-expect-error Type error
       tabsContainer,
       JSON.parse(JSON.stringify(panels.value)),
       {
@@ -344,7 +344,7 @@ function initializeDraggable() {
           const newIndex = event!.newIndex - 1;
           const oldIndex = event!.oldIndex - 1;
 
-          // 此处不能使用 JSON.parse(JSON.stringify) 的形式，否则会出现循环引用, 只需浅拷贝即可
+          // JSON.parse(JSON.stringify(...)) can't be used here, or it will cause a circular reference; a shallow copy is sufficient
           const clonedPanels = panels.value.map(panel => ({ ...panel }));
 
           panels.value = swapElements(clonedPanels, newIndex, oldIndex).filter(panel => panel !== null);
@@ -363,7 +363,7 @@ function initializeDraggable() {
 }
 
 /**
- * @description 切换到上一个 Tab
+ * @description Switch to the previous Tab
  */
 function switchToPreviousTab() {
   const currentIndex = panels.value.findIndex(panel => panel.name === nameRef.value);
@@ -380,7 +380,7 @@ function switchToPreviousTab() {
 }
 
 /**
- * @description 切换到下一个 Tab
+ * @description Switch to the next Tab
  */
 function switchToNextTab() {
   const currentIndex = panels.value.findIndex(panel => panel.name === nameRef.value);
@@ -426,7 +426,7 @@ onMounted(() => {
   mittBus.on('connect-terminal', (node: any) => {
     let index;
 
-    // 如果在 panels 中有相同的 k8s_id，则认为是对一个节点重复连接
+    // If panels already contains the same k8s_id, treat it as a duplicate connection to the same node
     panels.value.forEach(panel => {
       if (panel.name === node.k8s_id) {
         const newId = uuid();
@@ -443,7 +443,7 @@ onMounted(() => {
 
     panels.value.splice(index, 0, {
       ...node,
-      // 二者为组件库的必填项
+      // Both are required fields for the component library
       name: node.k8s_id,
       tab: node.label,
     });
@@ -497,7 +497,7 @@ onMounted(() => {
         });
 
         try {
-          // 发送初次连接的数据
+          // Send the initial connection data
           node.socket.send(JSON.stringify(firstSendMessage));
           updateIcon(connectInfo.value);
         } catch (e: any) {

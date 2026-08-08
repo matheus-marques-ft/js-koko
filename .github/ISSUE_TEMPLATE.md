@@ -1,16 +1,16 @@
-[简述你的问题]
+[Briefly describe your issue]
 
-##### 使用版本
-[请提供你使用的 Koko 版本 如 2.0.1 注: 1.4及以下版本不再提供支持]
+##### Version
+[Please provide the Koko version you're using, e.g. 2.0.1. Note: versions 1.4 and below are no longer supported]
 
-##### 问题复现步骤
-1. [步骤1]
-2. [步骤2]
+##### Steps to reproduce
+1. [Step 1]
+2. [Step 2]
 
-##### 具体表现[截图可能会更好些,最好能截全]
-
-
-##### 其他
+##### Actual behavior [screenshots are helpful, a full-page capture is best]
 
 
-[注:] 完成后请关闭 issue
+##### Additional context
+
+
+[Note:] please close the issue once resolved

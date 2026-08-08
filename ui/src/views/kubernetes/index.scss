@@ -23,7 +23,7 @@
         content: '';
       }
 
-      // 设置折叠状态下 padding 为零，否则侧边 item 图标无法点击
+      // Set padding to zero when collapsed, otherwise the sidebar item icon can't be clicked
       &.n-layout-sider--collapsed .n-layout-sider-scroll-container {
         padding: 0 !important;
       }

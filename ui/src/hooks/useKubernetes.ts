@@ -158,7 +158,7 @@ function guaranteeLunaConnection(ws: WebSocket) {
 }
 
 /**
- * @description 初始化同步节点树
+ * @description Initialize and sync the node tree
  */
 export function initTreeNodes(ws: WebSocket, id: string, info: any) {
   const unique = uuid();
@@ -184,7 +184,7 @@ export function initTreeNodes(ws: WebSocket, id: string, info: any) {
 }
 
 /**
- * 处理 socket Error
+ * Handle a socket error
  *
  * @param {string} type
  */
@@ -204,7 +204,7 @@ export function handleInterrupt(type: string, t: any) {
 }
 
 /**
- * @description 设置通用属性
+ * @description Set common attributes
  *
  * @param nodes
  * @param label
@@ -222,7 +222,7 @@ export function setCommonAttributes(nodes: any, label: string, isLeaf: boolean) 
 }
 
 /**
- * 处理最后的 container 节点
+ * Handle the final container node
  *
  * @param containers
  * @param podName
@@ -248,7 +248,7 @@ export function handleContainer(containers: any, podName: string, namespace: str
 }
 
 /**
- * 处理 Pod
+ * Handle Pods
  *
  * @param pods
  * @param namespace
@@ -264,7 +264,7 @@ export function handlePods(pods: any, namespace: string, socket: WebSocket) {
       pod.children = pod.containers;
       pod.prefix = () => h(Box, { size: 16 });
 
-      // 处理最后的 container
+      // Handle the final container
       handleContainer(pod.children, pod.name, namespace, socket);
 
       delete pod.containers;
@@ -275,7 +275,7 @@ export function handlePods(pods: any, namespace: string, socket: WebSocket) {
 }
 
 /**
- * 二次处理节点
+ * Post-process the nodes
  *
  * @param message
  * @param ws
@@ -299,7 +299,7 @@ export function handleTreeNodes(message: any, ws: WebSocket) {
   }
 
   Object.keys(originNode).forEach(node => {
-    // 得到每个 namespace
+    // Get each namespace
     const item = originNode[node];
 
     item.label = node;
@@ -308,12 +308,12 @@ export function handleTreeNodes(message: any, ws: WebSocket) {
     item.prefix = () => h(Folder, { size: 15 });
 
     if (item.pods && item.pods.length > 0) {
-      // 处理 pods
+      // Process pods
       item.children = item.pods;
 
       handlePods(item.pods, item.name, ws);
 
-      // 删除多余项
+      // Remove the redundant field
       delete item.pods;
     } else {
       delete item.pods;
@@ -328,7 +328,7 @@ export function handleTreeNodes(message: any, ws: WebSocket) {
 }
 
 /**
- * @description 处理 Tree 相关的 Socket 消息
+ * @description Handle Tree-related socket messages
  *
  * @param ws
  * @param event
@@ -356,7 +356,7 @@ export function handleTreeMessage(ws: WebSocket, event: MessageEvent) {
       const info = JSON.parse(message.data);
       const clipboardStore = useClipboardStore();
 
-      //* 设置通用配置以及全局唯一 id
+      //* Set common config and the global unique id
       clipboardStore.initialize(info.permission, info.clipboard_policy);
       paramsStore.setSetting(info.setting);
       kubernetesStore.setGlobalSetting(info.setting);
@@ -386,7 +386,7 @@ export function handleTerminalMessage(ws: WebSocket, event: MessageEvent, create
 
   const info = JSON.parse(event.data);
 
-  // 根据返回信息的 k8s id 找到与之对应的 terminal 实例
+  // Find the corresponding terminal instance based on the k8s id in the returned message
   const operatedNode = treeStore.getTerminalByK8sId(info.k8s_id);
   const currentTerminal = operatedNode?.terminal;
 
@@ -410,7 +410,7 @@ export function handleTerminalMessage(ws: WebSocket, event: MessageEvent, create
         const backspaceValue = sessionInfo.backspaceAsCtrlH ? '1' : '0';
         const ctrlCValue = sessionInfo.ctrlCAsCtrlZ ? '1' : '0';
 
-        // 存储到节点的配置映射中
+        // Store into the node's config map
         if (operatedNode.sessionIdMap) {
           operatedNode.sessionIdMap.set(info.k8s_id, sessionDetail.id);
         } else {
@@ -434,7 +434,7 @@ export function handleTerminalMessage(ws: WebSocket, event: MessageEvent, create
 
         operatedNode.themeName = sessionInfo.themeName;
 
-        // 如果当前激活的 tab 就是这个节点，立即更新 terminalStore 的配置
+        // If the currently active tab is this node, update terminalStore's config immediately
         if (terminalStore.currentTab === info.k8s_id) {
           terminalStore.setTerminalConfig('backspaceAsCtrlH', backspaceValue);
           terminalStore.setTerminalConfig('ctrlCAsCtrlZ', ctrlCValue);
@@ -537,7 +537,8 @@ export function handleTerminalMessage(ws: WebSocket, event: MessageEvent, create
     }
   }
 
-  // 由于 TERMINAL_GET_SHARE_USER 不会返回 k8s id 所以只能根据当前页保存的 k8s id 去获取 node 信息
+  // Since TERMINAL_GET_SHARE_USER does not return a k8s id, the node info can only be retrieved
+  // using the k8s id saved for the current page
   if (info.type === 'TERMINAL_GET_SHARE_USER') {
     const innerOperatedNode = treeStore.getTerminalByK8sId(terminalStore.currentTab);
     innerOperatedNode.userOptions = JSON.parse(info.data);
@@ -552,7 +553,7 @@ export function handleTerminalMessage(ws: WebSocket, event: MessageEvent, create
     const currentNode = treeStore.getTerminalByK8sId(currentTab);
 
     if (currentNode) {
-      // 为当前节点添加分享状态映射
+      // Add the share status map for the current node
       if (!currentNode.shareIdMap) {
         currentNode.shareIdMap = new Map();
       }
@@ -568,7 +569,7 @@ export function handleTerminalMessage(ws: WebSocket, event: MessageEvent, create
 }
 
 /**
- * @description 创建 k8s 连接
+ * @description Create a k8s connection
  */
 export function createConnect(t: any) {
   const pingInterval: Ref<number | null> = ref(null);
@@ -596,7 +597,7 @@ export function createConnect(t: any) {
 }
 
 /**
- * @description 初始化终端事件
+ * @description Initialize terminal events
  *
  * @param el
  * @param terminal
@@ -656,7 +657,7 @@ export function initTerminalEvent(
 
     kubernetesStore.setLastSendTime(new Date());
 
-    // 使用当前 terminalStore 中的配置，这样每个 tab 都有自己的配置
+    // Use the config from the current terminalStore, so each tab has its own config
     const currentConfig = {
       ...lunaConfig,
       ctrlCAsCtrlZ: terminalStore.ctrlCAsCtrlZ,
@@ -711,7 +712,7 @@ export function initTerminalEvent(
 }
 
 /**
- * @description 初始节点相关事件
+ * @description Initialize node-related events
  */
 export function initElEvent(
   el: HTMLElement,
@@ -806,7 +807,7 @@ export function initElEvent(
 }
 
 /**
- * @description 初始化全局 window 事件
+ * @description Initialize global window events
  *
  * @param fitAddon
  */
@@ -831,7 +832,7 @@ export function initCustomWindowEvent(fitAddon: FitAddon) {
 }
 
 /**
- * @description 发送 k8s 事件
+ * @description Send a k8s event
  *
  * @param socket
  * @param type
@@ -896,7 +897,7 @@ export function initMittBusEvents(searchAddon: SearchAddon, socket: WebSocket) {
 }
 
 /**
- * @description 创建 K8s 终端
+ * @description Create a K8s terminal
  */
 export function createTerminal(el: HTMLElement, socket: WebSocket, lunaConfig: ILunaConfig, nodeInfo: any, t: any) {
   const { fontSize, lineHeight, fontFamily } = lunaConfig;

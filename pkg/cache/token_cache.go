@@ -11,14 +11,14 @@ import (
 )
 
 /*
-缓存 ConnectToken：
-	token_id 和 addr 绑定创建 key
-	1.根据 key 获取缓存的 ConnectToken
-	2.新请求的 ConnectToken 加入缓存，已存在则引用计数加一
-	3.定时回收缓存中的 ConnectToken, 保证内存不会无限增长
-		清理条件：
-			1.引用计数为 0 且超时五分钟
-			2.超过 1 小时缓存
+Cache the ConnectToken:
+	The key is created by binding token_id and addr together
+	1. Retrieve the cached ConnectToken by key
+	2. A newly requested ConnectToken is added to the cache; if it already exists, its reference count is incremented
+	3. Periodically reclaim ConnectTokens from the cache to ensure memory doesn't grow unbounded
+		Cleanup conditions:
+			1. Reference count is 0 and it has been idle for over five minutes
+			2. Cached for over 1 hour
 */
 
 var TokenCacheInstance = NewConnectTokenCache()
@@ -127,7 +127,7 @@ func (c *ConnectTokenItem) refInc() {
 	c.expiredTime = time.Now().Add(5 * time.Minute).Unix()
 }
 
-// 绑定一个 addr 的 key
+// Bind a key to an addr
 
 func CreateAddrCacheKey(addr net.Addr, token string) string {
 	ip, _, _ := net.SplitHostPort(addr.String())

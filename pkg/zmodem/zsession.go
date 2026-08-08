@@ -204,7 +204,7 @@ type ZSession struct {
 	AbnormalFinish bool
 }
 
-// zsession 入口
+// Entry point for zsession
 func (s *ZSession) consume(p []byte) {
 	if s.gotZFin() {
 		for len(p) > 0 {
@@ -295,7 +295,7 @@ func (s *ZSession) consumeHeader(p []byte) {
 			s.frameCRCSize = crc32Size
 		}
 		if !ok {
-			// TCP/WebSocket 均可能把一个 ZMODEM 头拆成多个数据包，保留后继续解析。
+			// Either TCP or WebSocket may split a single ZMODEM header across multiple packets, so keep it and continue parsing.
 			hasInvalidTerminator := headerType == ZHEX &&
 				(bytes.IndexByte(candidate, 0x8a) != -1 || bytes.IndexByte(candidate, 0x0a) != -1)
 			if hasInvalidTerminator || len(candidate) > sessionHeaderBufferLimit {

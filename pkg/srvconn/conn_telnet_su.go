@@ -21,31 +21,31 @@ func LoginToTelnetSu(sc *TelnetConnection) error {
 
 /*
 
-切换用户的执行流程
+Execution flow for switching users
 
-一、根据系统不同，切换用户执行流程不同
-	Linux 系统 sudo 执行流程
-	1、执行 su - username; exit (这里的 exit 是为了退出 sudo)
-	2、等待密码输入的 prompt (如果是 root 切换普通 可能直接切换成功)
+I. The switch-user execution flow differs by system
+	Linux sudo execution flow
+	1. Execute su - username; exit (the exit here is to exit sudo)
+	2. Wait for the password input prompt (if switching from root to a normal user, it may switch successfully right away)
 
-	Cisco 交换机 切换执行流程
-	1、执行 enable
-	2、等待密码输入的 prompt
+	Cisco switch execution flow
+	1. Execute enable
+	2. Wait for the password input prompt
 
-	Huawei 交换机 切换执行流程
-	1、执行 super 15 (这里的 15 是 user privilege level)
-	2、等待密码输入的 prompt
+	Huawei switch execution flow
+	1. Execute super 15 (the 15 here is the user privilege level)
+	2. Wait for the password input prompt
 
-	H3C 交换机 切换执行流程
-	1、执行 super level-15 (这里的 15 是 user privilege level)
-	2、等待输入 username
-	3、等待输入 password
+	H3C switch execution flow
+	1. Execute super level-15 (the 15 here is the user privilege level)
+	2. Wait for the username prompt
+	3. Wait for the password prompt
 
-二、等待匹配成功提示字符，如果匹配到失败提示字符，就返回密码错误失败
-三、如果成功，返回 切换的提示信息，并通过 \r 换行
+II. Wait to match the success prompt characters; if the failure prompt characters are matched instead, return a password error failure
+III. If successful, return the switch prompt message, terminated with \r
 
-关于成功提示符:
-Linux 和 Cisco 交换机的成功提示符中，包含
+About the success prompt:
+The success prompt for Linux and Cisco switches contains
  Huawei:  [root@HUAWEI-xxx]
 
 
@@ -132,11 +132,11 @@ func (s *SuSwitchService) loginUsernameOrPassword(resultChan chan<- error) {
 		status := s.handleResult(recStr.Bytes())
 		switch status {
 		case StatusSuccess:
-			// 成功后，结束切换
+			// After success, end the switch
 			resultChan <- nil
 			return
 		case StatusMatch:
-			// 匹配到了，清空缓存
+			// Matched, clear the buffer
 			recStr.Reset()
 			logger.Debug("Sudo step result matched and rest")
 			continue
@@ -148,7 +148,7 @@ func (s *SuSwitchService) loginUsernameOrPassword(resultChan chan<- error) {
 
 		}
 		logger.Debugf("Sudo step result do not match any: %s", recStr.String())
-		// 没有匹配到，继续等待
+		// No match, keep waiting
 		time.Sleep(time.Millisecond * 100)
 	}
 }

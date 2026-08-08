@@ -6,7 +6,7 @@ import type { CommandLineConfig, ILocalTerminalConfig } from '@/types/modules/gu
 import { useTerminalSettingsStore } from '@/store/modules/terminalSettings.ts';
 
 /**
- * @description 获取本地 Terminal 配置
+ * @description Get the local Terminal config
  */
 function getLocalKokoSetting() {
   const terminalSettingsStore = useTerminalSettingsStore();

@@ -108,7 +108,7 @@ watch(
   () => fileManageStore.currentPath,
   newPath => {
     if (newPath) {
-      // 重置现有路径列表
+      // Reset the existing path list
       filePathList.value = [];
 
       if (newPath === '/') {
@@ -120,29 +120,29 @@ watch(
         disabledForward.value = true;
       }
 
-      // 分割路径
+      // Split the path
       const pathSegments = newPath.split('/').filter(segment => segment);
 
-      // 根据路径段构建完整的路径列表
+      // Build the full path list based on the path segments
       let currentPath = '';
       pathSegments.forEach((segment, index) => {
-        // 更新当前路径
+        // Update the current path
         currentPath += `/${segment}`;
 
-        // 添加到路径列表
+        // Add to the path list
         filePathList.value.push({
-          id: currentPath, // 使用完整路径作为ID
-          path: segment, // 显示路径段名称
+          id: currentPath, // Use the full path as the ID
+          path: segment, // Display the path segment name
           active: index === pathSegments.length - 1,
           showArrow: index !== pathSegments.length - 1,
         });
       });
 
-      // 滚动到最后一个路径段
+      // Scroll to the last path segment
       nextTick(() => {
         const contentRef = document.getElementsByClassName('n-scrollbar-content')[2];
         if (scrollRef.value && contentRef) {
-          // @ts-expect-error 目标对象滚动
+          // @ts-expect-error Scrolling the target object
           scrollRef.value.scrollTo({
             left: contentRef.scrollWidth,
             behavior: 'smooth',
@@ -160,7 +160,7 @@ watch(
   () => forwardPath.value,
   (newPath, oldPath) => {
     if (oldPath && (oldPath === newPath || oldPath.startsWith(`${newPath}/`))) {
-      // 如果 oldPath 包含 newPath，则重置 forwardPath 为 oldPath
+      // If oldPath contains newPath, reset forwardPath to oldPath
       forwardPath.value = oldPath;
     }
   }
@@ -207,14 +207,14 @@ const onClickOutside = () => {
 const handleRemoveItem = (data: { file: UploadFileInfo; fileList: UploadFileInfo[] }) => {
   const { file, fileList } = data;
 
-  // 如果文件正在上传中，发送停止上传事件
+  // If the file is currently uploading, emit a stop-upload event
   if (file.status === 'uploading') {
     mittBus.emit('stop-upload', { fileInfo: file });
-    // 对于正在上传的文件，暂时不移除，等待停止上传完成后再移除
+    // For files currently uploading, don't remove yet; wait until the stop-upload completes
     return false;
   }
 
-  // 对于上传失败、已完成或其他状态的文件，允许直接移除
+  // For files that failed, completed, or are in another state, allow direct removal
   uploadFileList.value = fileList.filter(item => item.id !== file.id);
   fileManageStore.setUploadFileList(uploadFileList.value);
 
@@ -222,7 +222,7 @@ const handleRemoveItem = (data: { file: UploadFileInfo; fileList: UploadFileInfo
 };
 
 /**
- * @description dropdown 的 select 回调
+ * @description Select callback for the dropdown
  * @param key
  */
 const handleSelect = (key: string) => {
@@ -256,50 +256,50 @@ const handleSelect = (key: string) => {
 };
 
 /**
- * @description 返回按钮对路径的预处理，用于移除最后的 /xxx
+ * @description Preprocessing of the path for the back button, used to remove the trailing /xxx
  * @param path
  */
 const removeLastPathSegment = (path: string): string => {
-  // 移除末尾的斜杠
+  // Remove the trailing slash
   if (path.endsWith('/')) {
     path = path.slice(0, -1);
   }
 
-  // 如果是根目录，返回空字符串
+  // If it's the root directory, return an empty string
   if (path === '') {
     return '';
   }
 
-  // 找到最后一个斜杠的位置
+  // Find the position of the last slash
   const lastSlashIndex = path.lastIndexOf('/');
 
-  // 如果没有找到斜杠，返回空字符串
+  // If no slash was found, return an empty string
   if (lastSlashIndex === -1) {
     return '';
   }
 
-  // 如果斜杠在开头（根目录的情况），返回根目录
+  // If the slash is at the beginning (root directory case), return the root directory
   if (lastSlashIndex === 0) {
     return '/';
   }
 
-  // 返回去掉最后一个路径段的结果
+  // Return the result with the last path segment removed
   return path.substring(0, lastSlashIndex);
 };
 
 /**
- * @description 后退
+ * @description Go back
  */
 const handlePathBack = () => {
   searchValue.value = '';
 
-  // 保存当前路径用于前进导航
+  // Save the current path for forward navigation
   disabledForward.value = false;
   forwardPath.value = fileManageStore.currentPath;
 
   const backPath = removeLastPathSegment(fileManageStore.currentPath);
 
-  // 如果返回到根目录，设置后退按钮为禁用
+  // If back to the root directory, disable the back button
   if (backPath === '' || backPath === '/') {
     disabledBack.value = true;
   }
@@ -311,7 +311,7 @@ const handlePathBack = () => {
 };
 
 /**
- * @description 前进
+ * @description Go forward
  */
 const handlePathForward = () => {
   searchValue.value = '';
@@ -323,7 +323,7 @@ const handlePathForward = () => {
     const forwardSegments = forwardPath.value.split('/');
 
     if (forwardSegments.length > currentSegments.length) {
-      // 移除多余的第一个路径段
+      // Remove the extra first path segment
       const firstExtraSegment = forwardSegments.slice(currentSegments.length)[0];
 
       const newForwardPath = `${fileManageStore.currentPath}/${firstExtraSegment}`;
@@ -337,24 +337,24 @@ const handlePathForward = () => {
 };
 
 /**
- * @description 鼠标手动跳转
+ * @description Manual navigation via mouse click
  */
 const handlePathClick = (item: IFilePath) => {
   searchValue.value = '';
 
-  // 如果点击了当前活动的路径段，不执行任何操作
+  // If the currently active path segment was clicked, do nothing
   if (item.active) return;
 
-  // 保存当前路径用于前进导航
+  // Save the current path for forward navigation
   disabledForward.value = false;
   forwardPath.value = fileManageStore.currentPath;
 
-  // 直接使用完整路径ID进行导航
+  // Navigate directly using the full path ID
   mittBus.emit('file-manage', { path: item.id, type: ManageTypes.CHANGE });
 };
 
 /**
- * @description 刷新
+ * @description Refresh
  */
 const handleRefresh = () => {
   loading.value = true;
@@ -365,7 +365,7 @@ const handleRefresh = () => {
 };
 
 /**
- * @description modal 对话框
+ * @description modal dialog
  */
 const modalPositiveClick = () => {
   const index =
@@ -433,14 +433,14 @@ const modalPositiveClick = () => {
 };
 
 /**
- * @description 文件上传
+ * @description File upload
  */
 const handleUploadFileChange = (options: { fileList: Array<UploadFileInfo> }) => {
   if (options.fileList.length > 0) {
     uploadFileList.value = options.fileList;
     fileManageStore.setUploadFileList(options.fileList);
 
-    // 使用 nextTick 确保数据更新后再打开抽屉
+    // Use nextTick to ensure the drawer opens only after the data has updated
     nextTick(() => {
       showInner.value = true;
     });
@@ -448,7 +448,7 @@ const handleUploadFileChange = (options: { fileList: Array<UploadFileInfo> }) =>
 };
 
 /**
- * @description 自定义上传
+ * @description Custom upload
  */
 const customRequest = ({ file, onFinish, onError, onProgress }: UploadCustomRequestOptions) => {
   mittBus.emit('file-upload', {
@@ -456,7 +456,7 @@ const customRequest = ({ file, onFinish, onError, onProgress }: UploadCustomRequ
     onFinish: () => {
       onFinish();
 
-      // 文件上传成功后，5秒后自动移除
+      // After the file uploads successfully, remove it automatically after 5 seconds
       setTimeout(() => {
         uploadFileList.value = uploadFileList.value.filter(item => item.id !== file.id);
         fileManageStore.setUploadFileList(uploadFileList.value);
@@ -470,10 +470,10 @@ const customRequest = ({ file, onFinish, onError, onProgress }: UploadCustomRequ
 };
 
 /**
- * @description 打开传输历史列表
+ * @description Open the transfer history list
  */
 // const handleOpenTransferList = () => {
-// 从 store 中恢复文件列表
+// Restore the file list from the store
 //   uploadFileList.value = [...fileManageStore.uploadFileList];
 
 //   nextTick(() => {
@@ -521,18 +521,18 @@ const rowProps = (row: RowData) => {
       const suffix = getFileName(row);
       const splicePath = `${fileManageStore.currentPath}/${row.name}`;
       if (suffix !== 'Folder') {
-        // return message.error('暂不支持文件预览');
+        // return message.error('File preview is not supported yet');
         return;
       }
 
       if (row.name === '..') {
         const backPath = removeLastPathSegment(fileManageStore.currentPath) || '/';
 
-        // 更新前进路径用于前进导航
+        // Update the forward path for forward navigation
         disabledForward.value = false;
         forwardPath.value = fileManageStore.currentPath;
 
-        // 如果返回到根目录，设置后退按钮为禁用
+        // If back to the root directory, disable the back button
         if (backPath === '/') {
           disabledBack.value = true;
         }
@@ -558,7 +558,7 @@ const rowProps = (row: RowData) => {
 onMounted(() => {
   mittBus.on('reload-table', handleTableLoading);
 
-  // 监听上传停止成功事件，移除对应的文件
+  // Listen for the upload-stopped event and remove the corresponding file
   mittBus.on('upload-stopped', (data: { fileId: string }) => {
     uploadFileList.value = uploadFileList.value.filter(item => item.id !== data.fileId);
     fileManageStore.setUploadFileList(uploadFileList.value);

@@ -75,7 +75,7 @@ func (s *Server) SFTPHandler(sess ssh.Session) {
 		if directRequest.IsToken() && config.GetConf().ConnectionTokenReusable {
 			tokenInfo := directRequest.ConnectToken
 			key := cache.CreateAddrCacheKey(sess.RemoteAddr(), tokenInfo.Id)
-			// 缓存 token 信息
+			// cache token info
 			cache.TokenCacheInstance.Save(key, tokenInfo)
 			defer cache.TokenCacheInstance.Recycle(key)
 			logger.Infof("SFTP token key %s cached", key)
@@ -279,7 +279,7 @@ func (s *Server) SessionHandler(sess ssh.Session) {
 
 func (s *Server) proxyDirectRequest(sess ssh.Session, user *model.User, asset model.PermAsset,
 	permAccount model.PermAccount) {
-	//  仅支持 ssh 的协议资产
+	//  only supports assets with the ssh protocol
 	remoteAddr, _, _ := net.SplitHostPort(sess.RemoteAddr().String())
 	req := &service.SuperConnectTokenReq{
 		UserId:        user.ID,
@@ -289,7 +289,7 @@ func (s *Server) proxyDirectRequest(sess ssh.Session, user *model.User, asset mo
 		ConnectMethod: model.ProtocolSSH,
 		RemoteAddr:    remoteAddr,
 	}
-	// ssh 非交互式的直连格式，不支持资产的登录复核
+	// ssh non-interactive direct-connect format does not support login review for the asset
 	tokenInfo, err := s.jmsService.CreateSuperConnectToken(req)
 	if err != nil {
 		msg := err.Error()
@@ -411,14 +411,14 @@ func (s *Server) proxyAssetCommand(sess ssh.Session, sshClient *srvconn.SSHClien
 			utils.IgnoreErrWriteString(sess, "Not support scp command")
 			return
 		}
-		// 开启了 vscode 支持，放开使用 scp 命令传输文件
-		// todo: 解析 scp 数据包，获取文件信息
+		// vscode support is enabled, allow using the scp command to transfer files
+		// todo: parse the scp data packet to get file information
 		logger.Infof("Execute scp command: %s", rawStr)
 	} else {
 		logger.Infof("Execute command: %s", rawStr)
 	}
 
-	// todo: 暂且不支持 acl 工单
+	// todo: acl tickets are not supported for now
 	acls := tokenInfo.CommandFilterACLs
 	sort.Sort(model.CommandACLs(acls))
 	for i := range acls {
@@ -791,7 +791,7 @@ func (s *Server) buildConnectToken(ctx ssh.Context, user *model.User, req *auth.
 		ConnectMethod: model.ProtocolSSH,
 		RemoteAddr:    remoteAddr,
 	}
-	// ssh 非交互式的直连格式，不支持资产的登录复核
+	// ssh non-interactive direct-connect format does not support login review for the asset
 	tokenInfo, err := s.jmsService.CreateSuperConnectToken(sessReq)
 	if err != nil {
 		msg := err.Error()

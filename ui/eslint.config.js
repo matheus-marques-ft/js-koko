@@ -37,7 +37,7 @@ export default antfu(
       ],
       'antfu/top-level-function': 'off',
 
-      // 忽略以 _ 开头的未使用变量
+      // Ignore unused variables starting with _
       '@typescript-eslint/no-unused-vars': [
         'error',
         {

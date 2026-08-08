@@ -252,7 +252,7 @@ func (c *Client) UploadFile(reqUrl string, gFile string, res interface{}, params
 	if err != nil {
 		return err
 	}
-	// 缓存读取内容，减少系统调用
+	// buffer the read content to reduce system calls
 	bufferFd := bufio.NewReader(fd)
 	defer fd.Close()
 	fi, err := fd.Stat()
@@ -269,7 +269,7 @@ func (c *Client) UploadFile(reqUrl string, gFile string, res interface{}, params
 	req.Header.Set("Content-Type", contentType)
 	c.SetReqHeaders(req, params)
 	/*
-		上传文件时，取消 timeout
+		cancel the timeout when uploading a file
 		A Timeout of zero means no timeout.
 	*/
 	client := http.Client{

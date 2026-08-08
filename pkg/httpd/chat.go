@@ -101,7 +101,7 @@ func (h *chat) runChat(conv *AIConversation) {
 		Type:        h.term.ChatAIType,
 	}
 
-	// 启动 streaming
+	// start streaming
 	go conn.Chat(&conv.InterruptCurrentChat)
 
 	h.streamResponses(ctx, conv, conn)

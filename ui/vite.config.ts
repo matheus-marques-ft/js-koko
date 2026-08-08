@@ -64,7 +64,7 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
           drop_debugger: true,
         },
       },
-      // 关闭文件计算
+      // Disable compressed size reporting
       reportCompressedSize: false,
       sourcemap: false,
       minify: false,
@@ -76,7 +76,7 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
           assetFileNames: `assets/[ext]/[name]-[hash].[ext]`,
           manualChunks(id) {
             if (id.includes('node_modules')) {
-              // 把 naive-ui 核心模块打包成一个文件
+              // Bundle the naive-ui core module into a single file
               if (id.includes('naive-ui')) {
                 return 'naive-vendor';
               }

@@ -17,7 +17,7 @@ import (
 	"github.com/jumpserver/koko/pkg/utils"
 )
 
-// 校验用户登录资产是否需要复核
+// verify whether the user's asset login requires review
 
 type LoginReviewHandler struct {
 	i18nLang   string
@@ -130,16 +130,16 @@ func (l *LoginReviewHandler) WaitTicketReview(ctx context.Context, srv *auth.Log
 	statusMsg := lang.T("Unknown status")
 	switch status {
 	case auth.StatusApprove:
-		// 审核通过
+		// review approved
 		formatMsg := lang.T("%s approved")
 		statusMsg = utils.WrapperString(fmt.Sprintf(formatMsg, processor), utils.Green)
 		success = true
 	case auth.StatusReject:
-		// 审核未通过
+		// review not approved
 		formatMsg := lang.T("%s rejected")
 		statusMsg = utils.WrapperString(fmt.Sprintf(formatMsg, processor), utils.Red)
 	case auth.StatusCancel:
-		// 审核取消
+		// review canceled
 		statusMsg = utils.WrapperString(lang.T("Cancel confirm"), utils.Red)
 	}
 	logger.Infof("User %s Login Confirm result: %s", l.user.String(), statusMsg)

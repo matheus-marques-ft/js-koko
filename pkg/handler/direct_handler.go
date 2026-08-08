@@ -22,18 +22,18 @@ import (
 )
 
 /*
-直接连接资产使用的登录名，支持使用以下格式：
+Login name used for direct asset connection, supports the following formats:
 
 1. JMS_username[@mysql|ssh|redis]@account_username@asset_target
 2. JMS_username[#mysql|ssh|redis]#account_username#asset_target
 
-JMS_username: 			JumpServer 平台上的用户名
-account_username：	    对应账号的用户名
-asset_target: 			对应资产的ip 或者 id
+JMS_username: 			the username on the JumpServer platform
+account_username:	    the username of the corresponding account
+asset_target: 			the ip or id of the corresponding asset
 
-FormatNORMAL: 使用 account_username 和 asset_ip 的登录方式，即1和2的方式
+FormatNORMAL: login using account_username and asset_ip, i.e. formats 1 and 2
 
-FormatToken:  使用 JMS-{token} 的方式登陆方式
+FormatToken:  login using the JMS-{token} format
 
 */
 
@@ -440,7 +440,7 @@ func (d *DirectHandler) Proxy(asset model.PermAsset) {
 			utils.IgnoreErrWriteString(d.term, utils.CharNewLine)
 			return
 		case model.ACLFaceVerify:
-			// todo: 需要人脸验证 后续需要发站内信通知用户，并且等待用户人脸验证通过
+			// todo: face verification required; later need to send an in-site message to notify the user and wait for the user to pass face verification
 			logger.Errorf("Create connect token and auth info failed: %s %s", tokenInfo.Code, tokenInfo.Detail)
 			msg := lang.T("Face verification is not supported yet. Please use the WebTerminal to connect the asset.")
 			utils.IgnoreErrWriteString(d.term, msg)

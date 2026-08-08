@@ -19,7 +19,7 @@ import (
 	"github.com/jumpserver/koko/pkg/session"
 )
 
-// uploadRemainReplay 上传遗留的录像
+// uploadRemainReplay uploads leftover replay recordings
 func uploadRemainReplay(jmsService *service.JMService) {
 	replayDir := config.GetConf().ReplayFolderPath
 	conf, err := jmsService.GetTerminalConfig()
@@ -110,7 +110,7 @@ func uploadRemainReplay(jmsService *service.JMService) {
 	logger.Info("Upload remain replay done")
 }
 
-// uploadRemainFTPFile 上传遗留的上传下载文件
+// uploadRemainFTPFile uploads leftover upload/download files
 func uploadRemainFTPFile(jmsService *service.JMService) {
 	ftpFileDir := config.GetConf().FTPFileFolderPath
 	conf, err := jmsService.GetTerminalConfig()
@@ -156,7 +156,7 @@ func uploadRemainFTPFile(jmsService *service.JMService) {
 	logger.Info("Upload remain FTP file done")
 }
 
-// keepHeartbeat 保持心跳
+// keepHeartbeat keeps the heartbeat alive
 func keepHeartbeat(jmsService *service.JMService) {
 	KeepWsHeartbeat(jmsService)
 }
@@ -293,7 +293,7 @@ type RemainFTPFile struct {
 }
 
 func parseReplayFilename(filename string) (replay RemainReplay, ok bool) {
-	// 未压缩的旧录像文件名格式是一个 UUID
+	// the filename format for uncompressed old replay files is a UUID
 	if len(filename) == 36 {
 		replay.Id = filename
 		replay.Version = model.Version2

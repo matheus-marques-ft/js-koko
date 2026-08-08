@@ -46,8 +46,8 @@ var (
 		//{0x1b, 0x5b, 0x34, 0x6c}, // 1b 5b 34 6c
 	}
 	vimMarks = [][]byte{
-		{0x1b, 0x5b, 0x32, 0x3b, 0x31}, // ESC ] 2;  设置标题 1b 5b 32 3b 31
-		//{0x1b, 0x5b, 0x32, 0x32, 0x3b, 0x30, 0x3b, 0x30, 0x74}, // 1b 5b 32 32 3b 30 3b 30  74  设置标题的控制字符
+		{0x1b, 0x5b, 0x32, 0x3b, 0x31}, // ESC ] 2;  set title 1b 5b 32 3b 31
+		//{0x1b, 0x5b, 0x32, 0x32, 0x3b, 0x30, 0x3b, 0x30, 0x74}, // 1b 5b 32 32 3b 30 3b 30  74  control characters for setting the title
 	}
 )
 
@@ -159,14 +159,14 @@ func (p *Parser) SetUserInputFilter(filter func([]byte) []byte) {
 	p.userInputFilter = filter
 }
 
-// ParseStream 解析数据流
+// ParseStream parses the data stream
 func (p *Parser) ParseStream(userInChan chan *exchange.RoomMessage, srvInChan <-chan []byte) (userOut, srvOut <-chan []byte) {
 	p.userOutputChan = make(chan []byte, 1)
 	p.srvOutputChan = make(chan []byte, 1)
 	logger.Infof("Session %s: Parser start", p.id)
 	go func() {
 		defer func() {
-			// 会话结束，结算命令结果
+			// Session ended, finalize the command result
 			p.sendCommandRecord()
 			close(p.cmdRecordChan)
 			close(p.userOutputChan)
@@ -213,7 +213,7 @@ func (p *Parser) ParseStream(userInChan chan *exchange.RoomMessage, srvInChan <-
 				case p.srvOutputChan <- b:
 				}
 			case now := <-cmdRecordTicker.C:
-				// 每隔一分钟超时，尝试结算一次命令
+				// Every minute on timeout, try to finalize the command once
 				if now.Sub(lastActiveTime) > time.Minute {
 					p.sendCommandRecord()
 					p.TerminalParser.TryMultipleCommands()
@@ -246,12 +246,12 @@ func (p *Parser) isEnterKeyPress(b []byte) bool {
 	if len(b) > 1 && bytes.HasSuffix(b, charLF) && isLinux(p.platform) {
 		return true
 	}
-	// 多行命令，会有 \r 字符，此处也需要拦截
+	// Multi-line commands contain \r characters, which also need to be intercepted here
 	if bytes.ContainsRune(b, '\r') {
 		return true
 	}
 	if p.TerminalParser != nil && p.TerminalParser.screenType == UsqlScreen {
-		// terminal 右键粘贴时，没有 \r 只有 \n
+		// When pasting via right-click in the terminal, there is no \r, only \n
 		if bytes.ContainsRune(b, '\n') && bytes.ContainsRune(b, ';') {
 			return true
 		}
@@ -259,7 +259,7 @@ func (p *Parser) isEnterKeyPress(b []byte) bool {
 	return false
 }
 
-// parseInputState 切换用户输入状态, 并结算命令和结果
+// parseInputState switches the user input state, and finalizes the command and its result
 func (p *Parser) parseInputState(b []byte) []byte {
 	lang := i18n.NewLang(p.i18nLang)
 	if p.zmodemParser.IsStartSession() {
@@ -283,7 +283,7 @@ func (p *Parser) parseInputState(b []byte) []byte {
 			if !userInterrupt {
 				return zmodem.CancelSequence
 			}
-			// 同时发送 Ctrl-C 和标准取消序列，兼容 PTY 信号与 rz/sz 协议取消。
+			// Send both Ctrl-C and the standard cancel sequence, to be compatible with PTY signal cancellation and rz/sz protocol cancellation.
 			cancelSequence := make([]byte, 0, 1+len(zmodem.CancelSequence))
 			cancelSequence = append(cancelSequence, zmodemInterruptCtrlC)
 			cancelSequence = append(cancelSequence, zmodem.CancelSequence...)
@@ -296,7 +296,7 @@ func (p *Parser) parseInputState(b []byte) []byte {
 			if p.zmodemParser.IsZFilePacket() && !p.enableUpload {
 				logger.Infof("Send zmodem user skip and srv abort to disable upload")
 				p.abortedFileTransfer = true
-				// 不记录中断的文件
+				// Do not record the aborted file
 				p.zmodemParser.SetAbortMark()
 				p.srvOutputChan <- zmodem.SkipSequence
 				return zmodem.AbortSession
@@ -304,8 +304,9 @@ func (p *Parser) parseInputState(b []byte) []byte {
 
 			if !p.zmodemParser.IsStartSession() && p.abortedFileTransfer {
 				/*
-					使用 zskip 中断文件上传之后，user 会发送 zfin 表示结束.
-					此时，因为 srv 端已经中断，则不应接受 zmodem 字符，可以发nil
+					After using zskip to abort the file upload, the user will send zfin to signal the end.
+					At this point, since the srv side has already aborted, zmodem characters should not
+					be accepted, so nil can be sent instead.
 				*/
 
 				logger.Info("Zmodem abort upload file finished")
@@ -322,7 +323,7 @@ func (p *Parser) parseInputState(b []byte) []byte {
 				logger.Infof("Send zmodem srv skip and user abort to disable download")
 				p.abortedFileTransfer = true
 				p.userOutputChan <- zmodem.AbortSession
-				// 不记录中断的文件
+				// Do not record the aborted file
 				p.zmodemParser.SetAbortMark()
 				return charEnter
 			}
@@ -373,7 +374,7 @@ func (p *Parser) parseInputState(b []byte) []byte {
 				p.confirmStatus.SetAction(model.ActionUnknown)
 				p.waitCommandConfirm()
 				defer p.confirmStatus.wg.Done()
-				// 避免因为关闭chan造成的panic
+				// Avoid a panic caused by the channel being closed
 				select {
 				case <-p.closed:
 					return
@@ -396,12 +397,12 @@ func (p *Parser) parseInputState(b []byte) []byte {
 					p.srvOutputChan <- []byte(statusMsg)
 					p.forbiddenCommand(p.confirmStatus.Cmd)
 				default:
-					// 默认是取消 不执行
+					// The default is to cancel and not execute
 					p.setCurrentCmdStatusLevel(model.ReviewCancel)
 					p.srvOutputChan <- []byte("\r\n")
 					p.userOutputChan <- p.breakInputPacket()
 				}
-				// 审核结束, 重置状态
+				// Review finished, reset the status
 				p.confirmStatus.SetStatus(StatusNone)
 			}()
 		case "n":
@@ -451,7 +452,7 @@ func (p *Parser) parseInputState(b []byte) []byte {
 			}
 		}
 		if strings.Contains(p.command, "\r") {
-			// 先记录一次 多行命令的输入，output 暂且为空
+			// First record the multi-line command input once, with output left empty for now
 			p.sendCommandToChan()
 			p.command = ""
 		}
@@ -489,7 +490,7 @@ func (p *Parser) forbiddenCommand(cmd string) {
 	p.userOutputChan <- p.breakInputPacket()
 }
 
-// ParseUserInput 解析用户的输入
+// ParseUserInput parses the user's input
 func (p *Parser) ParseUserInput(b []byte) []byte {
 	if p.userInputFilter != nil {
 		b = p.userInputFilter(b)
@@ -498,13 +499,13 @@ func (p *Parser) ParseUserInput(b []byte) []byte {
 	return nb
 }
 
-// parseZmodemState 解析数据，查看是不是处于zmodem状态
-// 处于zmodem状态不会再解析命令
+// parseZmodemState parses the data to check whether it is in zmodem state
+// While in zmodem state, commands will no longer be parsed
 func (p *Parser) parseZmodemState(b []byte) {
 	p.zmodemParser.Parse(b)
 }
 
-// parseVimState 解析vim的状态，处于vim状态中，里面输入的命令不再记录
+// parseVimState parses the vim state; while in vim state, commands entered inside it are no longer recorded
 func (p *Parser) parseVimState(b []byte) {
 	if !p.isEditMode && IsEditEnterMode(b) {
 		p.isEditMode = true
@@ -537,7 +538,7 @@ func (p *Parser) parseVimState(b []byte) {
 	}
 }
 
-// splitCmdStream 将服务器输出流分离到命令buffer和命令输出buffer
+// splitCmdStream splits the server output stream into the command buffer and the command output buffer
 func (p *Parser) splitCmdStream(b []byte) []byte {
 	lang := i18n.NewLang(p.i18nLang)
 	if p.zmodemParser.IsStartSession() {
@@ -575,14 +576,14 @@ func (p *Parser) splitCmdStream(b []byte) []byte {
 	return b
 }
 
-// ParseServerOutput 解析服务器输出
+// ParseServerOutput parses the server output
 func (p *Parser) ParseServerOutput(b []byte) []byte {
 	p.lock.Lock()
 	defer p.lock.Unlock()
 	return p.splitCmdStream(b)
 }
 
-// IsMatchCommandRule 判断命令是不是在过滤规则中
+// IsMatchCommandRule determines whether the command matches a filter rule
 func (p *Parser) IsMatchCommandRule(command string) (CommandRule,
 	string, bool) {
 	for i := range p.cmdFilterACLs {
@@ -668,7 +669,7 @@ func (p *Parser) waitCommandConfirm() {
 			logger.Infof("Session %s: Closed", p.id)
 			return
 		case <-ctx.Done():
-			// 取消
+			// Canceled
 			if err = p.jmsService.CancelConfirmByRequestInfo(cancelReq); err != nil {
 				logger.Errorf("Session %s: Cancel command confirm err: %s", p.id, err)
 			}
@@ -702,7 +703,7 @@ func (p *Parser) IsInZmodemRecvState() bool {
 	return p.zmodemParser.IsStartSession()
 }
 
-// Close 关闭parser
+// Close closes the parser
 func (p *Parser) Close() {
 	select {
 	case <-p.closed:
@@ -813,9 +814,9 @@ func matchMark(p []byte, marks [][]byte) bool {
 
 /*
 
- h3c 的 ssh 拦截
+ h3c ssh interception
 
- 华为 telnet ssh
+ Huawei telnet ssh
 
 */
 
@@ -880,9 +881,9 @@ func (p *Parser) breakInputPacket() []byte {
 }
 
 /*
-	Ctrl + U --> 清除光标左边字符 '\x15'
-	Ctrl + K --> 清除光标右边字符 '\x0B'
-	Ctrl + E --> 移动光标到行末尾 '\x05'
+	Ctrl + U --> clear the character to the left of the cursor '\x15'
+	Ctrl + K --> clear the character to the right of the cursor '\x0B'
+	Ctrl + E --> move the cursor to the end of the line '\x05'
 */
 
 const (

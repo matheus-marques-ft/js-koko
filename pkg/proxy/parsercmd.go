@@ -141,7 +141,7 @@ func (s *TerminalParser) feed(p []byte) {
 	//	s.Screen.Feed(p)
 	//	s.ResizeRows()
 	default:
-		// 默认就是 LinuxScreen
+		// Defaults to LinuxScreen
 		s.Screen.Feed(p)
 		s.ResizeRows()
 	}
@@ -163,17 +163,17 @@ func (s *TerminalParser) Feed(p []byte) {
 	}()
 	s.mux.Lock()
 	defer s.mux.Unlock()
-	// 检测是否是 tmux 和 screen 的情况
+	// Check whether this is a tmux or screen situation
 	s.CheckSubScreen(p)
 
 	s.feed(p)
 
 	if s.state == OutputState {
-		// output 且解析出 cmd 才写入 output 减少内存
+		// Only write to output once cmd has been parsed out, to reduce memory usage
 		if s.srvOutputBuf.Len() < maxBufSize {
 			s.srvOutputBuf.Write(p)
 		} else {
-			// 长时间输出达到最大值，直接命令结算一次
+			// Output has run for a long time and reached the max size, finalize the command immediately
 			outputBuf := s.TrySrvOutput()
 			if s.EmitCommands != nil {
 				s.EmitCommands(s.cmd, outputBuf)
@@ -185,26 +185,26 @@ func (s *TerminalParser) Feed(p []byte) {
 		half := len(ps1) / 2
 		halfPs1 := ps1[:half]
 		rowStr := s.GetCursorRow()
-		// 单行的命令解析
+		// Single-line command parsing
 		if strings.HasPrefix(rowStr, halfPs1) && s.cmd != "" {
 			outputBuf := s.TrySrvOutput()
 			if s.EmitCommands != nil {
 				s.EmitCommands(s.cmd, outputBuf)
 			}
 			if terminalDebug {
-				// 从这里找上一个匹配的 ps1 row，然后这之间的 rows 就是output
+				// From here, find the previous matching ps1 row; the rows in between are the output
 				fmt.Println("============= match ps1 command================")
 				fmt.Println("ps1: ", s.Ps1sStr)
 				fmt.Println("command input:  ", s.cmd)
 				fmt.Println("command output: ", outputBuf)
 				fmt.Println("===============================================")
-				// 这个时候应该是 输入状态了，命令结束了
+				// At this point it should be in input state, the command has ended
 			}
 			s.cmd = ""
 			return
 		}
 
-		// 多行命令 解析需要等完整输出，等下次输入的结果中，解析数据。参见WriteInput 里对 len(s.commands) >= 1  的处理
+		// Parsing multi-line commands must wait for the full output; the data is parsed on the next input's result. See the handling of len(s.commands) >= 1 in WriteInput.
 	}
 }
 
@@ -294,7 +294,7 @@ func (s *TerminalParser) WriteInput(chars []byte) (string, bool) {
 		s.Ps1sStr = s.GetPs1()
 	})
 
-	// 复制粘贴多行命令执行
+	// Copy-pasted multi-line command execution
 	s.TryMultipleCommands()
 
 	isEnterFunc := DefaultEnterKeyPressHandler
@@ -303,7 +303,8 @@ func (s *TerminalParser) WriteInput(chars []byte) (string, bool) {
 	}
 
 	/*
-		如果是多行命令，先完全解析下 input 内容做拦截，具体的执行命令及结果，则从命令解析器里面查找内容
+		If it is a multi-line command, first fully parse the input content for interception;
+		the actual executed command and its result are then looked up from the command parser.
 	*/
 	s.InputBuf.Write(chars)
 	if isEnterFunc(chars) {
@@ -312,15 +313,15 @@ func (s *TerminalParser) WriteInput(chars []byte) (string, bool) {
 		//if s.isSubMode {
 		//	cmd = s.TryTmuxInput()
 		//} else {
-		//	// 针对多行命令，从最新一行，往前查找到最近一次的 ps1 之间的都是命令
+		//	// For multi-line commands, starting from the latest row, everything found going backward up to the most recent ps1 is the command
 		//	cmd = s.TryInput()
 		//}
 		cmd := s.TryLastRowInput()
 		if cmd == "" && len(chars) > 1 {
-			//从返回值解析，cmd 为 空的情况下，当前输入的则为
+			// Parsing from the return value, when cmd is empty the current input is used instead
 			cmd = strings.TrimSpace(string(chars))
 			if strings.Contains(cmd, "\r") {
-				// 多行命令
+				// Multi-line command
 				s.commands = strings.Split(cmd, "\r")
 			}
 		} else {
@@ -347,14 +348,14 @@ func (s *TerminalParser) WriteInput(chars []byte) (string, bool) {
 			}
 		}
 		if terminalDebug {
-			// 从这里找上一个匹配的 ps1 row，然后这之间的 rows 就是output
+			// From here, find the previous matching ps1 row; the rows in between are the output
 			fmt.Println("============= enter command================")
 			fmt.Println("ps1: ", s.Ps1sStr)
 			fmt.Println("command input1:  ", cmd)
 			fmt.Println("command input2:  ", s.cmd)
 			fmt.Println("commands :  ", s.commands)
 			fmt.Println("===============================================")
-			// 这个时候应该是 输出状态了，命令结束了
+			// At this point it should be in output state, the command has ended
 		}
 		return cmd, true
 	}
@@ -392,12 +393,12 @@ func (s *TerminalParser) GetPs1() string {
 }
 
 func (s *TerminalParser) FindCommands(cmds []string, startCmd string) {
-	// 从最后一行开始往前查询命令
+	// Search for commands backward starting from the last row
 	outputs := make([]string, 0, 10)
 	rows := s.Screen.Rows
 	j := len(rows) - 1
 
-	// 去除 startCMd的干扰
+	// Remove interference from startCMd
 	for j > 0 {
 		row := rows[j]
 		j--
@@ -421,7 +422,7 @@ func (s *TerminalParser) FindCommands(cmds []string, startCmd string) {
 			rowStr := row.String()
 			j--
 			if strings.Contains(rowStr, currentCommand) && strings.Contains(rowStr, halfPs1) {
-				// 匹配到 当前的命令，获取下所有的output
+				// Matched the current command, get all the output below it
 				output := reverseString(outputs)
 				if s.EmitCommands != nil {
 					s.EmitCommands(currentCommand, output)
@@ -444,19 +445,19 @@ func (s *TerminalParser) FindCommands(cmds []string, startCmd string) {
 
 func (s *TerminalParser) TryMultipleCommands() {
 	if s.screenType != LinuxScreen {
-		// 仅 linux screen方式支持
+		// Only supported for the linux screen mode
 		return
 	}
 	if len(s.commands) >= 1 {
 		commands := s.commands
 
-		// 需要从返回的数据里，获取到当前的命令结果
+		// Need to obtain the current command result from the returned data
 		lastCommand := commands[len(commands)-1]
 		startCommand := lastCommand
 		if startCommand == "" {
 			startCommand = s.Ps1sStr
 		} else {
-			//排除最后一个未执行的
+			// Exclude the last one, which has not been executed yet
 			commands = commands[:len(commands)-1]
 		}
 		if terminalDebug {
@@ -482,10 +483,10 @@ func reverseString(rows []string) string {
 
 // filtering for password input scenarios
 var passwordPromptRegexps = []*regexp.Regexp{
-	regexp.MustCompile(`(?i)password:?$`),                    // 常见的 Password:
+	regexp.MustCompile(`(?i)password:?$`),                    // Common "Password:"
 	regexp.MustCompile(`(?i)\[sudo]\s*password\s*for\s+.*:`), // [sudo] password for user:
-	regexp.MustCompile(`(?i)enter\s+passphrase\s+for\s+.*:`), // SSH/GPG 私钥 passphrase
-	regexp.MustCompile(`(?i)passphrase\s+for\s+key\s+.*:`),   // git/ssh key 提示
+	regexp.MustCompile(`(?i)enter\s+passphrase\s+for\s+.*:`), // SSH/GPG private key passphrase
+	regexp.MustCompile(`(?i)passphrase\s+for\s+key\s+.*:`),   // git/ssh key prompt
 	regexp.MustCompile(`(?i)请输入密码[:：]?$`),
 	regexp.MustCompile(`(?i)mot de passe[:：]?$`),
 	regexp.MustCompile(`(?i)contraseña[:：]?$`),
@@ -502,19 +503,19 @@ func IsPasswordPrompt(ps1 string) bool {
 	return false
 }
 
-// 合并的正则表达式，匹配以下四种模式：
-// 1. 隐藏光标: ESC[?25l
-// 2. ANSI颜色转义序列: ESC[数字m
-// 3. ANSI位置转义序列: ESC[数字;数字H
-// 4. 数字开头的状态栏格式: [数字] 空格 内容 空格 内容...
+// Combined regular expression, matching the following four patterns:
+// 1. Hide cursor: ESC[?25l
+// 2. ANSI color escape sequence: ESC[numberm
+// 3. ANSI position escape sequence: ESC[number;numberH
+// 4. Status bar format starting with a number: [number] space content space content...
 // 0D 0A \r \n
 var (
 	tmuxBarRegx = regexp.MustCompile(`\x1b\[\?(\d+)l\x1b\[(\d+)m\x1b\[(\d+)m\x1b\[(\d+);(\d+)H\[(\d+)]\s+\d+:.+\s+.+\s+.+\s+.+\x1b\(B.*\x1b\[\?(\d+)l\x1b\[\?(\d+)h`)
 	// \[(\d+)]\s+\d+:.+\s+.+\s+.+\s+.+
 
-	// 可能包含 \r\n
+	// May contain \r\n
 	//tmuxBar1Regx = regexp.MustCompile(`\r\n\[(\d+)]\s+\d+:.+\s+.+\s+.+\s+.+\x1b\(B`)
 
-	// 不包含 \r\n
+	// Does not contain \r\n
 	tmuxBar2Regx = regexp.MustCompile(`\[(\d+)]\s+\d+:.+\s+.+\s+.+\s+.+\x1b\(B`)
 )

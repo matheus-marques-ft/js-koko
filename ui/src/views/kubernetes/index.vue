@@ -35,14 +35,14 @@ const themeColors = computed(() => {
 });
 
 /**
- * 加载节点
+ * Load node
  *
  * @param _node
  */
 function handleSyncLoad(_node?: TreeOption) {
   // syncLoadNodes(node);
 
-  // 根据节点宽度自动拓宽
+  // Automatically widen based on node width
   setTimeout(() => {
     const tableElement = document.querySelector('.n-descriptions-table') as HTMLElement;
     const sideElement = document.querySelector('.n-layout-sider') as HTMLElement;
@@ -57,7 +57,7 @@ function handleSyncLoad(_node?: TreeOption) {
 }
 
 /**
- * 点击 Tree 图标的回调
+ * Callback for clicking the Tree icon
  */
 function handleTreeClick() {
   isFolded.value = !isFolded.value;
@@ -65,7 +65,7 @@ function handleTreeClick() {
 }
 
 /**
- * 重新加载
+ * Reload
  */
 function handleReloadTree() {
   if (socket.value) {

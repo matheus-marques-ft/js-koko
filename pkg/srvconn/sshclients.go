@@ -7,7 +7,7 @@ import (
 )
 
 type UserSSHClient struct {
-	ID   string // 这个 user ssh client key 参考 MakeReuseSSHClientKey
+	ID   string // this user ssh client key, see MakeReuseSSHClientKey
 	data map[*SSHClient]int64
 	name string
 }
@@ -19,7 +19,7 @@ func (u *UserSSHClient) AddClient(client *SSHClient) {
 func (u *UserSSHClient) GetClient() *SSHClient {
 	var selectClient *SSHClient
 	var refCount int32
-	// 取引用最少的 SSHClient
+	// Pick the SSHClient with the fewest references
 	for clientItem := range u.data {
 		if refCount <= clientItem.RefCount() {
 			refCount = clientItem.RefCount()
@@ -79,8 +79,8 @@ func (s *SSHManager) run() {
 		select {
 		case now := <-tick.C:
 			/*
-				1. 1 分钟无访问则 让所有的 UserSSHClient recycleClients
-				2. 并清理 count==0 的 UserSSHClient
+				1. If there is no access for 1 minute, make all UserSSHClient recycleClients
+				2. And clean up UserSSHClient with count==0
 			*/
 			if now.After(latestVisited.Add(time.Minute)) {
 				needRemovedClients := make([]string, 0, len(data))
@@ -126,7 +126,7 @@ func (s *SSHManager) run() {
 			reqClient.SSHClient.KeyId = reqClient.key
 			logger.Infof("Store new client(%s) remain %d", reqClient.String(), userClient.Count())
 		case reqClient := <-s.releaseChan:
-			// 收到释放请求，及时释放对应的 SSHClient
+			// Received a release request; release the corresponding SSHClient promptly
 			reqClient.decreaseSelfRef()
 			if userClient, ok := data[reqClient.key]; ok {
 				userClient.recycleClients()
