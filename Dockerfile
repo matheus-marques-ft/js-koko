@@ -1,4 +1,4 @@
-FROM ghcr.io/matheus-marques-ft/koko-base:20260810_145356 AS stage-build
+FROM ghcr.io/matheus-marques-ft/koko-base:20260810_154256 AS stage-build
 WORKDIR /opt/koko
 ARG TARGETARCH
 COPY . .
