@@ -70,8 +70,11 @@ pam-alias() {
         return 1
     fi
     alias "$1"="$2"
-    printf '%s=%s\n' "$1" "$2" >> "${JMS_ALIAS_FIFO}"
-    echo "Saved: alias $1='$2' (persists across sessions)"
+    if printf '%s=%s\n' "$1" "$2" >> "${JMS_ALIAS_FIFO}" 2>/dev/null; then
+        echo "Saved: alias $1='$2' (persists across sessions)"
+    else
+        echo "Warning: could not persist alias $1 (active for this session only)" >&2
+    fi
 }
 PAMALIAS
 fi
@@ -105,6 +108,13 @@ fi
 
 chown -R "${K8S_OS_USER}:${K8S_OS_USER}" .kube
 chown -R "${K8S_OS_USER}:${K8S_OS_USER}" .bashrc
+
+# The fifo is created by Koko's own (privileged) process outside this tmpfs,
+# owned by that process's user - the sandboxed shell runs as K8S_OS_USER
+# instead, so without this it can never write to it (permission denied).
+if [ -n "${JMS_ALIAS_FIFO}" ]; then
+    chown "${K8S_OS_USER}" "${JMS_ALIAS_FIFO}" 2>/dev/null || true
+fi
 
 export TMPDIR=/nonexistent
 
