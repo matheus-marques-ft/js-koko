@@ -5,6 +5,7 @@ COPY . .
 
 ARG VERSION
 ENV VERSION=$VERSION
+ENV GOFLAGS=-mod=mod
 
 WORKDIR /opt/koko/ui
 RUN yarn build
