@@ -480,6 +480,12 @@ func (s *Server) getK8sConConn(localTunnelAddr *net.TCPAddr) (srvConn srvconn.Se
 	if s.connOpts.k8sContainer != nil {
 		return s.getContainerConn(clusterServer)
 	}
+
+	realUser := s.connOpts.authInfo.User
+	tokenID := s.connOpts.authInfo.Id
+	sanitizedUsername := srvconn.SanitizeK8sOSUsername(realUser.Username, realUser.ID)
+	aliasLines := s.getK8sAliasLines(tokenID)
+
 	srvConn, err = srvconn.NewK8sConnection(
 		srvconn.K8sToken(s.account.Secret),
 		srvconn.K8sClusterServer(clusterServer),
@@ -493,8 +499,33 @@ func (s *Server) getK8sConConn(localTunnelAddr *net.TCPAddr) (srvConn srvconn.Se
 			"K8sName":   asset.Name,
 			"Namespace": namespaceValue,
 		}),
+		srvconn.K8sRealUser(sanitizedUsername, realUser.Username),
+		srvconn.K8sAliasLines(aliasLines),
+		srvconn.K8sTokenID(tokenID),
+		srvconn.K8sJMService(s.jmsService),
 	)
 	return
+}
+
+// getK8sAliasLines fetches the real user's saved kubectl shell aliases and
+// formats them as ready-to-source `alias name='command'` lines. Best-effort:
+// if the core doesn't support this yet (older version) or the call fails,
+// the session still proceeds with no personal aliases instead of failing.
+func (s *Server) getK8sAliasLines(tokenID string) []string {
+	aliases, err := s.jmsService.GetK8sShellAliases(tokenID)
+	if err != nil {
+		logger.Errorf("K8sCon get shell aliases err: %s", err)
+		return nil
+	}
+	lines := make([]string, 0, len(aliases))
+	for name, command := range aliases {
+		lines = append(lines, fmt.Sprintf("alias %s=%s", name, shellSingleQuote(command)))
+	}
+	return lines
+}
+
+func shellSingleQuote(s string) string {
+	return "'" + strings.ReplaceAll(s, "'", `'\''`) + "'"
 }
 
 func (s *Server) getContainerConn(clusterServer string) (

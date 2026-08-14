@@ -1,6 +1,7 @@
 package srvconn
 
 import (
+	"encoding/base64"
 	"fmt"
 	"os"
 	"os/exec"
@@ -101,7 +102,7 @@ func (k *KubectlProxyConn) Env() []string {
 	gloablTokenMaps.Store(k.Id, clusterServer)
 	k8sName := strings.Trim(strconv.Quote(o.ExtraEnv["K8sName"]), "\"")
 	k8sName = strings.ReplaceAll(k8sName, "`", "\\`")
-	return []string{
+	env := []string{
 		fmt.Sprintf("KUBECTL_USER=%s", o.Username),
 		fmt.Sprintf("KUBECTL_CLUSTER=%s", k8sReverseProxyURL),
 		fmt.Sprintf("KUBECTL_NAMESPACE=%s", o.ExtraEnv["Namespace"]),
@@ -110,6 +111,22 @@ func (k *KubectlProxyConn) Env() []string {
 		fmt.Sprintf("WELCOME_BANNER=%s", config.KubectlBanner),
 		fmt.Sprintf("K8S_NAME=%s", k8sName),
 	}
+	if o.RealUsername != "" {
+		env = append(env, fmt.Sprintf("JMS_REAL_USER=%s", o.RealUsername))
+	}
+	if o.RealUserDisplay != "" {
+		display := strings.ReplaceAll(o.RealUserDisplay, "`", "")
+		display = strings.ReplaceAll(display, "$", "")
+		env = append(env, fmt.Sprintf("JMS_REAL_USER_DISPLAY=%s", display))
+	}
+	if o.AliasFifoPath != "" {
+		env = append(env, fmt.Sprintf("JMS_ALIAS_FIFO=%s", o.AliasFifoPath))
+	}
+	if len(o.AliasLines) > 0 {
+		joined := strings.Join(o.AliasLines, "\n")
+		env = append(env, fmt.Sprintf("JMS_ALIAS_LINES_B64=%s", base64.StdEncoding.EncodeToString([]byte(joined))))
+	}
+	return env
 }
 
 var proxyconfigTmpl = `apiVersion: v1

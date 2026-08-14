@@ -1,6 +1,7 @@
 package localcommand
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"os/exec"
@@ -20,6 +21,7 @@ type LocalCommand struct {
 	cmd       *exec.Cmd
 	ptyFd     *os.File
 	ptyClosed chan struct{}
+	waitErr   error
 
 	ptyWin *pty.Winsize
 }
@@ -59,10 +61,35 @@ func New(command string, argv []string, options ...Option) (*LocalCommand, error
 			lcmd.ptyFd.Close()
 			close(lcmd.ptyClosed)
 		}()
-		_ = lcmd.cmd.Wait()
+		lcmd.waitErr = lcmd.cmd.Wait()
 	}()
 
 	return lcmd, nil
+}
+
+// Wait blocks until the underlying process has exited.
+func (lcmd *LocalCommand) Wait() error {
+	<-lcmd.ptyClosed
+	return lcmd.waitErr
+}
+
+// ExitCode returns the process exit code once it has exited, or -1 if it
+// hasn't exited yet or the exit code couldn't be determined (e.g. killed by
+// a signal).
+func (lcmd *LocalCommand) ExitCode() int {
+	select {
+	case <-lcmd.ptyClosed:
+	default:
+		return -1
+	}
+	if lcmd.waitErr == nil {
+		return 0
+	}
+	var exitErr *exec.ExitError
+	if errors.As(lcmd.waitErr, &exitErr) {
+		return exitErr.ExitCode()
+	}
+	return -1
 }
 
 func (lcmd *LocalCommand) Read(p []byte) (n int, err error) {
