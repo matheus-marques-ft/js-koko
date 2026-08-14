@@ -45,6 +45,7 @@ jobs:
           config-name: release-config.yml
           version: ${{ steps.get_version.outputs.TAG }}
           tag: ${{ steps.get_version.outputs.TAG }}
+          disable-releaser: true
 
       - uses: actions/setup-node@v4
         with:
@@ -61,6 +62,7 @@ jobs:
          make all -s && ls build
         env:
           VERSION: ${{ steps.get_version.outputs.TAG }}
+          GOFLAGS: -mod=mod
 
       - name: Clean up any existing release for this tag
         env:
@@ -79,6 +81,7 @@ jobs:
         with:
           draft: false
           prerelease: ${{ !endsWith(steps.get_version.outputs.TAG, '-stable') }}
+          make_latest: ${{ endsWith(steps.get_version.outputs.TAG, '-stable') }}
           name: ${{ steps.get_version.outputs.TAG }}
           body: ${{ steps.create_release.outputs.body }}
           files: |

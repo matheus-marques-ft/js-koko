@@ -151,4 +151,4 @@ require (
 
 replace github.com/gliderlabs/ssh => github.com/jumpserver-dev/ssh v0.3.10
 
-replace github.com/jumpserver-dev/sdk-go => ../js-sdk-go
+replace github.com/jumpserver-dev/sdk-go => github.com/matheus-marques-ft/js-sdk-go v0.1.10
