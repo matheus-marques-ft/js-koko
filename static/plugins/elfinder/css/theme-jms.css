@@ -1,35 +1,25 @@
 @font-face {
-  font-family: 'Open Sans';
+  font-family: 'Instrument Sans';
   font-style: italic;
-  font-weight: 400;
-  src: local('Open Sans Italic'), local('OpenSans-Italic'), url("../fonts/OpenSans-Italic.ttf") format('truetype');
+  font-weight: 400 700;
+  src: local('Instrument Sans Italic'), url("../fonts/InstrumentSans-Italic-Variable.ttf") format('truetype-variations');
+  font-display: swap;
 }
 @font-face {
-  font-family: 'Open Sans';
-  font-style: italic;
-  font-weight: 700;
-  src: local('Open Sans Bold Italic'), local('OpenSans-BoldItalic'), url("../fonts/OpenSans-BoldItalic.ttf") format('truetype');
-}
-@font-face {
-  font-family: 'Open Sans';
+  font-family: 'Instrument Sans';
   font-style: normal;
-  font-weight: 400;
-  src: local('Open Sans'), local('OpenSans'), url("../fonts/OpenSans-Regular.ttf") format('truetype');
-}
-@font-face {
-  font-family: 'Open Sans';
-  font-style: normal;
-  font-weight: 700;
-  src: local('Open Sans Bold'), local('OpenSans-Bold'), url("../fonts/OpenSans-Bold.ttf") format('truetype');
+  font-weight: 400 700;
+  src: local('Instrument Sans'), url("../fonts/InstrumentSans-Variable.ttf") format('truetype-variations');
+  font-display: swap;
 }
 .elfinder {
   color: #546e7a;
-  font-family: "Open Sans", sans-serif;
+  font-family: "Instrument Sans", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 .elfinder.ui-widget.ui-widget-content {
-  font-family: "Open Sans", sans-serif;
+  font-family: "Instrument Sans", sans-serif;
   -webkit-box-shadow: 0 1px 8px rgba(0, 0, 0, 0.6);
   box-shadow: 0 1px 8px rgba(0, 0, 0, 0.6);
   -webkit-border-radius: 0;
@@ -187,14 +177,14 @@ select.elfinder-tabstop.ui-state-hover {
   background-color: #ff9800;
 }
 .elfinder-toast-msg {
-  font-family: "Open Sans", sans-serif;
+  font-family: "Instrument Sans", sans-serif;
   font-size: 17px;
 }
 /**
  * For Ace Editor
  */
 #ace_settingsmenu {
-  font-family: "Open Sans", sans-serif;
+  font-family: "Instrument Sans", sans-serif;
   -webkit-box-shadow: 0 1px 30px rgba(0, 0, 0, 0.6) !important;
   box-shadow: 0 1px 30px rgba(0, 0, 0, 0.6) !important;
   background-color: #1d2736 !important;
@@ -1542,7 +1532,7 @@ a.ui-button:active .ui-icon,
   background: #fff;
 }
 .ui-widget-content {
-  font-family: "Open Sans", sans-serif;
+  font-family: "Instrument Sans", sans-serif;
   color: #546e7a;
 }
 .std42-dialog .ui-dialog-buttonpane button {
