@@ -1,19 +1,15 @@
 import en from './en.json';
-import ja from './ja.json';
-import zh from './zh.json';
-import zh_Hant from './zh_Hant.json';
+import es from './es.json';
+import pt_br from './pt_br.json';
 
 export const message = {
-  zh: {
-    ...zh,
-  },
-  zh_hant: {
-    ...zh_Hant,
-  },
   en: {
     ...en,
   },
-  ja: {
-    ...ja,
+  es: {
+    ...es,
+  },
+  pt_br: {
+    ...pt_br,
   },
 };
