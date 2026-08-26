@@ -302,7 +302,7 @@ function initSocketEvent(socket: WebSocket, t: any) {
             break;
           }
 
-          const blob: Blob = new Blob(downloadTask.buffers, {
+          const blob: Blob = new Blob(downloadTask.buffers as BlobPart[], {
             type: 'application/octet-stream',
           });
 
