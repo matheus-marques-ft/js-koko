@@ -1,0 +1,7 @@
+{
+  "ClipboardCopyDenied": "No se permite copiar desde la terminal",
+  "ClipboardPasteDenied": "No se permite pegar en la terminal",
+  "ClipboardTextLimitExceeded": "El texto a {action} supera el límite de {limit} caracteres",
+  "Copy": "Copiar",
+  "Paste": "Pegar"
+}
